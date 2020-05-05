@@ -27,9 +27,15 @@ termux-ubuntu-shell focal
 ```
 * Install depends inside the chroot:
 ```
-apt-get install libatomic1
+apt update -qq && apt install -y libatomic1 curl
 ```
 * Copy precompiled binaries from this project's releases (or build your own, tho it will take a while!) into /usr/local/bin:
+```
+RELEASE=master-at-5720f42
+curl -sL https://github.com/rcmorano/docker-cardano-node/releases/download/${RELEASE}/cardano-node -o /usr/local/bin/cardano-node
+curl -sL https://github.com/rcmorano/docker-cardano-node/releases/download/${RELEASE}/cardano-cli -o /usr/local/bin/cardano-cli
+chmod +x /usr/local/bin/cardano*
+```
 * Enjoy!
 
 [termux-ubuntu-baids]: https://github.com/rcmorano/termux-ubuntu-baids#instructions
