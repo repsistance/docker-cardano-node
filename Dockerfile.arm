@@ -16,7 +16,7 @@ WORKDIR /opt/cardano-node
 RUN git clone https://github.com/input-output-hk/cardano-node /opt/cardano-node && \
     git checkout ${CARDANO_NODE_COMMIT} && \
     cabal update && \
-    cabal new-build all
+    for target in cardano-node cardano-cli; do cabal new-build ${target}; done
 
 # TODO: there is probably a better way to extract/install binaries
 RUN mkdir /output && \

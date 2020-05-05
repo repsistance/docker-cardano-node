@@ -38,4 +38,9 @@ chmod +x /usr/local/bin/cardano*
 ```
 * Enjoy!
 
+
+```
+cardano-cli genesis --genesis-output-dir /tmp/tmp.jcXsn2IeFK.d --start-time 1588693293 --protocol-parameters-file /opt/cardano/cnode/scripts/cardano-node/scripts/protocol-params.json --k 2160 --protocol-magic 459045235 --n-poor-addresses 128 --n-delegate-addresses 7 --total-balance 8000000000000000 --avvm-entry-count 128 --avvm-entry-balance 10000000000000 --delegate-share 0.9 --real-pbft --secret-seed 2718281828
+```
+
 [termux-ubuntu-baids]: https://github.com/rcmorano/termux-ubuntu-baids#instructions
