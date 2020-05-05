@@ -3,13 +3,24 @@ FROM arm64v8/ubuntu:20.04
 ARG CARDANO_NODE_COMMIT=master
 ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
 
+# TODO: probably clean up some depends
+# list was borrowed from https://github.com/cardano-community/guild-operators/blob/master/files/ptn0/scripts/prereqs.sh
 RUN apt-get update -qq && apt-get install -y curl gnupg && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list && \
-    apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y python3 build-essential pkg-config libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev npm yarn make g++ tmux git jq wget libncursesw5 ghc cabal-install
+    apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y python3 build-essential pkg-config libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev npm yarn make g++ tmux git jq wget libncursesw5 ghc cabal-install
 
 WORKDIR /opt/cardano-node
+
 RUN git clone https://github.com/input-output-hk/cardano-node /opt/cardano-node && \
     git checkout ${CARDANO_NODE_COMMIT} && \
     cabal update && \
     cabal new-build all
+
+# TODO: there is probably a better way to extract/install binaries
+RUN mkdir /output && \
+    find dist-newstyle/build/aarch64-linux -type f -executable | grep -v ".so$" | while read bin; \
+    do \
+      cp -a $PWD/$bin /output
+    done
