@@ -1,0 +1,89 @@
+#!/bin/bash
+
+function iohk-fftn-init() {
+
+  test -z "$IOHK_NETNAME"             && export IOHK_NETNAME=byron-staging
+  test -z "$GUILD_OPS_BRANCH"         && export GUILD_OPS_BRANCH=master
+  test -z "$CNODE_BRANCH"             && export CNODE_BRANCH=master
+  test -z "$CNODE_HOME"               && export CNODE_HOME=/opt/cardano/cnode
+  test -z "$CNODE_DB_PATH"            && export CNODE_DB_PATH=/opt/cardano/cnode/db
+  test -z "$CNODE_CONFIG_FILE"        && export CNODE_CONFIG_FILE=${CNODE_HOME}/files/configuration.yaml
+  test -z "$CNODE_GENESIS_FILE"       && export CNODE_GENESIS_FILE=${CNODE_HOME}/files/genesis.json
+  test -z "$CNODE_TOPOLOGY_FILE"      && export CNODE_TOPOLOGY_FILE=${CNODE_HOME}/files/topology.json
+  test -z "$CNODE_PORT"               && export CNODE_PORT=30501
+  test -z "$CNODE_HOST_ADDR"          && export CNODE_HOST_ADDR=$(curl ifconfig.me)
+  test -z "$SIGNING_KEY"              && export SIGNING_KEY=${CNODE_HOME}/priv/pbft0.key
+  test -z "$VRF_KEY"                  && export VRF_KEY=${CNODE_HOME}/priv/pbft0.vrf
+  test -z "$CERT_KEY"                 && export CERT_KEY=${CNODE_HOME}/priv/pbft0.cert
+  test -z "$CARDANO_NODE_SOCKET_PATH" && export CARDANO_NODE_SOCKET_PATH=${CNODE_HOME}/sockets/node0.socket
+  test -z "$PROTOCOL_MAGIC"           && export PROTOCOL_MAGIC=$(jq -r .protocolConsts ${CNODE_GENESIS_FILE} | jq -r .protocolMagic)
+
+}
+
+
+function iohk-fftn-setup() {
+
+  iohk-fftn-init
+
+  echo "Creating Folder Structure .."
+  
+  if grep -q CNODE_HOME ~/.bashrc; then
+    echo "Environment Variable already set up!"
+  else
+    echo "Setting up Environment Variable"
+    echo "export CNODE_HOME=${CNODE_HOME}" >> ~/.bashrc
+  fi
+
+  for dir in files db logs scripts sockets priv
+  do
+    mkdir -p $CNODE_HOME/${dir}
+  done
+  
+  cd "$CNODE_HOME/files" || return
+  
+  curl https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/files/ptn0.yaml -o ${CNODE_CONFIG_FILE}
+  curl https://raw.githubusercontent.com/input-output-hk/iohk-nix/${CNODE_BRANCH}/cardano-lib/ff-genesis.json | jq '.' > ${CNODE_GENESIS_FILE}
+  #curl https://raw.githubusercontent.com/input-output-hk/cardano-node/${CNODE_BRANCH}/configuration/defaults/${IOHK_NETNAME}/topology.json | jq '.' > ${CNODE_TOPOLOGY_FILE}
+  cat > ${CNODE_TOPOLOGY_FILE} <<EOF
+{
+  "Producers": [
+    {
+      "addr": "relays-new.ff.dev.cardano.org",
+      "port": 3001,
+      "valency": 1
+    }
+  ]
+}
+EOF
+  
+  # If using a different CNODE_HOME than in this example, execute the below:
+  # sed -i -e "s#/opt/cardano/cnode#${CNODE_HOME}#" $CNODE_HOME/files/fftn.yaml
+  ## For future use:
+  ## It generates random NodeID:
+  ## -e "s#NodeId:.*#NodeId:`od -A n -t u8 -N 8 /dev/urandom`#" \
+  
+  cd $CNODE_HOME/scripts || return
+  curl -o createAddr.sh https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/scripts/cnode-helper-scripts/createAddr.sh
+  curl -o sendADA.sh https://github.com/cardano-community/guild-operators/blob/${GUILD_OPS_BRANCH}/scripts/cnode-helper-scripts/sendADA.sh
+  curl -o system-info.sh https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/scripts/system-info.sh
+  chmod 755 ./*.sh
+  # If you opt for an alternate CNODE_HOME, please run the below:
+  # sed -i -e "s#/opt/cardano/cnode#${CNODE_HOME}#" *.sh
+
+}
+
+function iohk-fftn-cnode-run-as-passive() {
+
+  iohk-fftn-init
+
+  test -e ${SIGNING_KEY} || cardano-cli keygen --real-pbft --secret ${SIGNING_KEY} --no-password
+  test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
+
+  cardano-node run \
+    --config ${CNODE_CONFIG_FILE} \
+    --database-path ${CNODE_DB_PATH} \
+    --host-addr ${CNODE_HOST_ADDR} \
+    --port ${CNODE_PORT} \
+    --topology ${CNODE_TOPOLOGY_FILE}
+
+}

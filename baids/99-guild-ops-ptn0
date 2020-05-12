@@ -1,0 +1,76 @@
+#!/bin/bash
+
+function guild-ops-ptn0-init() {
+
+  test -z "$GUILD_OPS_BRANCH" && export GUILD_OPS_BRANCH=master
+  test -z "$CNODE_HOME"       && export CNODE_HOME=/opt/cardano/cnode
+  test -z "$CNODE_CONFIG"     && export CNODE_CONFIG=${CNODE_HOME}/files/ptn0.yaml
+  test -z "$CNODE_PORT"       && export CNODE_PORT=9000
+  test -z "$SIGNING_KEY"      && export SIGNING_KEY=${CNODE_HOME}/priv/pbft0.key
+  test -z "$VRF_KEY"          && export VRF_KEY=${CNODE_HOME}/priv/pbft0.vrf
+  test -z "$CERT_KEY"         && export CERT_KEY=${CNODE_HOME}/priv/pbft0.cert
+  test -z "$CNODE_HOST_ADDR"  && export CNODE_HOST_ADDR=$(curl ifconfig.me)
+
+}
+
+
+function guild-ops-ptn0-setup() {
+
+  guild-ops-ptn0-init
+
+  echo "Creating Folder Structure .."
+  
+  if grep -q CNODE_HOME ~/.bashrc; then
+    echo "Environment Variable already set up!"
+  else
+    echo "Setting up Environment Variable"
+    echo "export CNODE_HOME=${CNODE_HOME}" >> ~/.bashrc
+  fi
+
+  for dir in files db logs scripts sockets priv
+  do
+    mkdir -p $CNODE_HOME/${dir}
+  done
+  
+  cd "$CNODE_HOME/files" || return
+  
+  curl -o ptn0.yaml https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/files/ptn0.yaml
+  curl https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/files/genesis.json | jq '.' > genesis.json
+  curl https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/files/topology.json | jq '.' > topology.json
+  
+  # If using a different CNODE_HOME than in this example, execute the below:
+  # sed -i -e "s#/opt/cardano/cnode#${CNODE_HOME}#" $CNODE_HOME/files/ptn0.yaml
+  ## For future use:
+  ## It generates random NodeID:
+  ## -e "s#NodeId:.*#NodeId:`od -A n -t u8 -N 8 /dev/urandom`#" \
+  
+  cd $CNODE_HOME/scripts || return
+  curl -o env https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/scripts/cnode-helper-scripts/env
+  curl -o createAddr.sh https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/scripts/cnode-helper-scripts/createAddr.sh
+  curl -o sendADA.sh https://github.com/cardano-community/guild-operators/blob/${GUILD_OPS_BRANCH}/scripts/cnode-helper-scripts/sendADA.sh
+  curl -o cnode.sh https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/scripts/cnode.sh.templ
+  curl -o cabal-build-all.sh https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/scripts/cabal-build-all.sh
+  curl -o stack-build.sh https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/scripts/stack-build.sh
+  curl -o system-info.sh https://raw.githubusercontent.com/cardano-community/guild-operators/${GUILD_OPS_BRANCH}/files/ptn0/scripts/system-info.sh
+  chmod 755 ./*.sh
+  # If you opt for an alternate CNODE_HOME, please run the below:
+  # sed -i -e "s#/opt/cardano/cnode#${CNODE_HOME}#" *.sh
+
+}
+
+function guild-ops-ptn0-cnode-run-as-passive() {
+
+  guild-ops-ptn0-init
+
+set -x
+  test -e ${SIGNING_KEY} || cardano-cli keygen --real-pbft --secret ${SIGNING_KEY} --no-password
+  test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
+
+  cardano-node run \
+    --config ${CNODE_HOME}/files/ptn0.yaml \
+    --database-path ${CNODE_HOME}/db \
+    --host-addr ${CNODE_HOST_ADDR} \
+    --port ${CNODE_PORT} \
+    --topology ${CNODE_HOME}/files/topology.json
+
+}
