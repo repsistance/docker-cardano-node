@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  ptn0-passive:
+    restart: unless-stopped
+    image: rcmorano/cardano-node:guild-ops-ptn0-passive
+    ports:
+      - "30501:30501"
+    environment:
+      - CNODE_PORT=30501
+    volumes:
+      - ${PWD}/data/ptn0/opt/cardano/cnode/priv:/opt/cardano/cnode/priv
+      - ${PWD}/data/ptn0/opt/cardano/cnode/db:/opt/cardano/cnode/db
+      - ${PWD}/data/ptn0/opt/cardano/cnode/logs:/opt/cardano/cnode/logs
+      - ${PWD}/baids:/nonexistent/.baids/functions.d
