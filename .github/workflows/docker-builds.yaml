@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == github.event.repository.owner.login
     steps:
+    - uses: actions/checkout@v2
     - name: build-n-push
       env:
         CARDANO_NODE_BUILD_BRANCH: master
