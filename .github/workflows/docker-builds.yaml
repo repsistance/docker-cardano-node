@@ -25,6 +25,7 @@ jobs:
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive"
       run: |
+        set -x
         git clone https://github.com/rcmorano/baids.git ~/.baids
         ln -s $PWD/baids ~/.baids/functions.d/docker-cardano-node
         source ~/.baids/baids
