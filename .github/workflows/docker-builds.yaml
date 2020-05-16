@@ -4,10 +4,17 @@ on:
     paths:
     - 'Dockerfile.*'
     - 'baids/**'
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 */8 * * *'
+  watch:
+    types: [started]
+
 jobs:
   build-n-push:
     name: Build and push docker images
     runs-on: ubuntu-latest
+    if: github.actor == github.event.repository.owner.login
     steps:
     - name: build-n-push
       env:
