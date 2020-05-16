@@ -7,7 +7,7 @@ on:
 jobs:
   build-n-push:
     name: Build and push docker images
-    runs-on: rcmorano/cardano-node:master
+    runs-on: ubuntu-latest
     steps:
     - name: build-n-push
       env:
@@ -15,9 +15,9 @@ jobs:
         DOCKER_REGISTRY: docker.io
         DOCKER_IMAGE_NAME: rcmorano/cardano-node
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
-        DOCKER_TARGETS: "build-env guild-ops-ptn0-passive iohk-fftn-passive"
+        DOCKER_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive"
       run: |
-        source /nonexistant/.baids/baids
+        source baids/*
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
