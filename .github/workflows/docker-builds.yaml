@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: build-n-push
-      shell: /bin/bash -x
+      shell: /bin/bash -x {0}
       env:
         CARDANO_NODE_BUILD_BRANCH: master
         DOCKER_REGISTRY: docker.io
