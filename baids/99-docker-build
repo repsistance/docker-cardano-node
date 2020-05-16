@@ -52,7 +52,12 @@ function cardano-node-docker-build() {
 
 function cardano-node-docker-push() {
 
-  # push everything but the build-env
+  for target in ${DOCKER_SRC_TARGETS}
+  do
+    BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${CARDANO_NODE_COMMIT}
+    docker push ${BUILD_IMAGE}
+  done
+
   for target in ${DOCKER_FINAL_TARGETS}
   do
     DETAILED_TAG=$(docker inspect -f '{{ .Created }}' ${DOCKER_IMAGE_NAME}|awk -F':' '{print $1$2}'|sed 's%-\|T%%g')-${CI_COMMIT_SHORT_SHA}-${CARDANO_NODE_COMMIT}
