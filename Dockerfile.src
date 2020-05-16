@@ -1,0 +1,12 @@
+FROM alpine AS src
+RUN apk add --no-cache git
+ARG CARDANO_NODE_COMMIT=master
+ARG CARDANO_NODE_GIT_REPOSITORY=https://github.com/input-output-hk/cardano-node
+ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
+ENV CARDANO_NODE_GIT_REPOSITORY ${CARDANO_NODE_GIT_REPOSITORY}
+
+RUN git clone ${CARDANO_NODE_GIT_REPOSITORY} /src && \
+    cd /src && \
+    git checkout ${CARDANO_NODE_COMMIT} && \
+    git submodule init && \
+    git submodule update --recursive

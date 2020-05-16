@@ -1,0 +1,65 @@
+#!/bin/bash
+
+function cardano-node-docker-init() {
+
+  CARDANO_NODE_COMMIT=master
+  DOCKER_REPOSITORY=registry.local:5000
+  DOCKER_IMAGE_NAME=rcmorano/cardano-node
+  DOCKER_IMAGE_URI=${DOCKER_REPOSITORY}/${DOCKER_IMAGE_NAME}
+  DOCKER_SRC_TARGETS="src src-build"
+  DOCKER_FINAL_TARGETS="guild-ops-ptn0-passive iohk-fftn-passive"
+
+}
+
+function cardano-node-docker-pull-cache() {
+
+  SRC_IMAGE=${DOCKER_IMAGE_URI}:src-${CARDANO_NODE_COMMIT}
+  BUILD_IMAGE=${DOCKER_IMAGE_URI}:src-build-${CARDANO_NODE_COMMIT}
+
+  docker pull ${SRC_IMAGE} || true
+  docker pull ${BUILD_IMAGE} || true
+
+}
+
+function cardano-node-docker-build() {
+
+  for target in ${DOCKER_SRC_TARGETS}
+  do
+    BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${CARDANO_NODE_COMMIT}
+    IMAGE_PRESENT=$(docker pull ${BUILD_IMAGE} &> /dev/null || echo false)
+    if [ "$IMAGE_PRESENT" == "false" ]
+    then
+      docker build \
+        -f Dockerfile.${target} \
+        --build-arg CARDANO_NODE_COMMIT=${CARDANO_NODE_COMMIT} \
+        --cache-from ${BUILD_IMAGE} \
+        --label docker-source-commit=${CI_COMMIT_SHORT_SHA} \
+        --label cardano-node-commit=${CARDANO_NODE_COMMIT} \
+        -t ${BUILD_IMAGE} \
+        .
+    fi
+  done
+
+  for target in ${DOCKER_FINAL_TARGETS}
+  do
+    docker build \
+      --build-arg CARDANO_NODE_COMMIT=${CARDANO_NODE_COMMIT} \
+      --target ${target} \
+      -t ${DOCKER_IMAGE_NAME}:${target} .
+  done
+
+}
+
+function cardano-node-docker-push() {
+
+  # push everything but the build-env
+  for target in ${DOCKER_FINAL_TARGETS}
+  do
+    DETAILED_TAG=$(docker inspect -f '{{ .Created }}' ${DOCKER_IMAGE_NAME}|awk -F':' '{print $1$2}'|sed 's%-\|T%%g')-${CI_COMMIT_SHORT_SHA}-${CARDANO_NODE_COMMIT}
+    DETAILED_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${DETAILED_TAG}
+    docker tag ${DOCKER_IMAGE_NAME}:${target} ${DETAILED_IMAGE}
+    docker push ${DOCKER_IMAGE_NAME}:${target}
+    docker push ${DETAILED_IMAGE}
+  done
+
+}

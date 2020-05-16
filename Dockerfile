@@ -1,25 +1,7 @@
-FROM ubuntu:20.04 AS build-env
-
-ARG CABAL_TARGETS="cardano-node cardano-cli"
-ENV CNODE_HOME /opt/cardano-node
-WORKDIR ${CNODE_HOME}
-
-RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg build-essential pkg-config ghc cabal-install git libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev
-
 ARG CARDANO_NODE_COMMIT=master
-ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
-RUN git clone https://github.com/input-output-hk/cardano-node ${CNODE_HOME} && \
-    git checkout ${CARDANO_NODE_COMMIT} && \
-    cabal update && \
-    for target in ${CABAL_TARGETS}; do cabal new-build ${target}; done
 
-# TODO: there is probably a better way to extract/install binaries
-RUN mkdir /output && \
-    find dist-newstyle/build -type f -executable | grep -v ".so$" | while read bin; \
-    do \
-      cp -a ${PWD}/$bin /output; \
-    done
+FROM rcmorano/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
+FROM rcmorano/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
 
 # production base
 FROM ubuntu:20.04 AS base
@@ -34,7 +16,7 @@ RUN mkdir -p /nonexistent /data && \
     mkdir -p ${CNODE_HOME} && \
     chown -R nobody: ${CNODE_HOME}
 RUN apt-get update -qq && apt-get install -y ${BASE_PACKAGES} ${BUILD_PACKAGES}
-COPY --from=build-env /output/cardano* /usr/local/bin/
+COPY --from=src-build /output/cardano* /usr/local/bin/
 USER nobody
 RUN curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
 COPY baids/* /nonexistent/.baids/functions.d/
@@ -62,5 +44,5 @@ FROM iohk-fftn-base AS iohk-fftn-leader
 ENV CNODE_ROLE=leader
 
 FROM gcr.io/distroless/base AS barebone-node
-COPY --from=build-env /output/cardano* /usr/local/bin/
+COPY --from=src-build /output/cardano* /usr/local/bin/
 CMD ["/usr/local/bin/cardano-node"]

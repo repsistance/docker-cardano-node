@@ -1,0 +1,15 @@
+#!/bin/bash
+
+function cardano-node-git-init() {
+
+  GIT_REPO_URI="https://github.com/input-output-hk/cardano-node"
+  GIT_REPO_BRANCH=${1:-master}
+
+}
+
+function cardano-node-get-git-branch-head() {
+
+  cardano-node-git-init $1
+  git ls-remote ${GIT_REPO_URI} ${GIT_REPO_BRANCH} | awk '{print $1}'
+
+}

@@ -1,0 +1,25 @@
+name: Trigger Gitlab Job on push events
+on:
+  push:
+    paths:
+    - 'Dockerfile.*'
+    - 'baids/**'
+jobs:
+  build-n-push:
+    name: Build and push docker images
+    runs-on: rcmorano/cardano-node:master
+    steps:
+    - name: build-n-push
+      env:
+        CARDANO_NODE_BUILD_BRANCH: master
+        DOCKER_REGISTRY: docker.io
+        DOCKER_IMAGE_NAME: rcmorano/cardano-node
+        DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
+        DOCKER_TARGETS: "build-env guild-ops-ptn0-passive iohk-fftn-passive"
+      run: |
+        source /nonexistant/.baids/baids
+        export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
+        export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
+        export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
+        cardano-node-docker-build
+        cardano-node-docker-push
