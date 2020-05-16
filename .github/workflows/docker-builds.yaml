@@ -28,7 +28,7 @@ jobs:
         pwd
         ls -hl
         source baids/*
-        type cardano-node-docker-build
+        type cardano-node-get-git-branch-head
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
