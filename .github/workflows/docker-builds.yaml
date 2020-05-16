@@ -1,4 +1,4 @@
-name: Trigger Gitlab Job on push events
+name: docker builds
 on:
   push:
     paths:
