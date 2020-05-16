@@ -25,6 +25,8 @@ jobs:
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive"
       run: |
+        pwd
+        ls -hl
         source baids/*
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
