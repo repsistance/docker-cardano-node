@@ -23,12 +23,13 @@ jobs:
         DOCKER_REGISTRY: docker.io
         DOCKER_IMAGE_NAME: rcmorano/cardano-node
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
-        DOCKER_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive"
+        DOCKER_SRC_TARGETS: "src src-build"
+        DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive"
       run: |
-        set -x
-        git clone https://github.com/rcmorano/baids.git ~/.baids
+        curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
         ln -s $PWD/baids ~/.baids/functions.d/docker-cardano-node
         source ~/.baids/baids
+        set -x
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
