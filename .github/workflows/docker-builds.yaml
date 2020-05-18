@@ -21,11 +21,11 @@ jobs:
       || ( github.event_name == 'push' )
     steps:
     - uses: actions/checkout@v2
-    - name: Login to GitHub Docker Registry
-        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-        env:
-          DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.GITHUB_DOCKER_PASSWORD }}
+#    - name: Login to GitHub Docker Registry
+#        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+#        env:
+#          DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
+#          DOCKER_PASSWORD: ${{ secrets.GITHUB_DOCKER_PASSWORD }}
     - name: build-n-push
       env:
         CARDANO_NODE_BUILD_BRANCH: master
