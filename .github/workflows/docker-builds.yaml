@@ -21,16 +21,16 @@ jobs:
       || ( github.event_name == 'push' )
     steps:
     - uses: actions/checkout@v2
-#    - name: Login to GitHub Docker Registry
-#        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-#        env:
-#          DOCKER_USERNAME: ${{ secrets.GITHUB_DOCKER_USERNAME }}
-#          DOCKER_PASSWORD: ${{ secrets.GITHUB_DOCKER_PASSWORD }}
+    - name: Login to GitHub Docker Registry
+        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: build-n-push
       env:
         CARDANO_NODE_BUILD_BRANCH: master
         DOCKER_REGISTRY: docker.io
-        DOCKER_IMAGE_NAME: repsistance/cardano-node
+        DOCKER_IMAGE_NAME: rcmorano/cardano-node
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_SRC_TARGETS: "src src-build"
         DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive"
