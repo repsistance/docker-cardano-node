@@ -4,6 +4,7 @@ on:
     paths:
     - 'Dockerfile.*'
     - 'baids/**'
+    - '.github/**'
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '0 */8 * * *'
@@ -14,8 +15,6 @@ jobs:
   build-n-push:
     name: Build and push docker images
     runs-on: ubuntu-latest
-    #if: ${{ ${{ github.event_name == 'started' && github.actor == github.event.repository.owner.login }} || github.event_name == 'push' }}
-    if: ( github.event_name == 'started' && github.actor == 'rcmorano' ) || ( github.event_name == 'started' && github.actor == github.event.repository.owner.login ) || ( github.event_name == 'push' )
     steps:
     - uses: actions/checkout@v2
     - uses: azure/docker-login@v1
