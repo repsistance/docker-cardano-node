@@ -17,11 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: azure/docker-login@v1
-      with:
-        login-server: index.docker.io
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Login to Docker Registry
+      run: docker login ${DOCKER_REGISTRY} --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
+      env:
+        DOCKER_REGISTRY: docker.io
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: build-n-push
       env:
         CARDANO_NODE_BUILD_BRANCH: master
@@ -34,7 +35,6 @@ jobs:
         #APT_ARGS: "-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
         #apt update -qq && apt install ${APT_ARGS} ${APT_PACKAGES}
       run: |
-        docker login
         curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
         ln -s $PWD/baids ~/.baids/functions.d/docker-cardano-node
         source ~/.baids/baids
