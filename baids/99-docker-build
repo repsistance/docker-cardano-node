@@ -60,7 +60,7 @@ function cardano-node-docker-push() {
 
   for target in ${DOCKER_FINAL_TARGETS}
   do
-    DETAILED_TAG=$(docker inspect -f '{{ .Created }}' ${DOCKER_IMAGE_NAME}|awk -F':' '{print $1$2}'|sed 's%-\|T%%g')-${CI_COMMIT_SHORT_SHA}-${CARDANO_NODE_COMMIT}
+    DETAILED_TAG=$(docker inspect -f '{{ .Created }}' ${DOCKER_IMAGE_NAME}:${target}|awk -F':' '{print $1$2}'|sed 's%-\|T%%g')-${CI_COMMIT_SHORT_SHA}-${CARDANO_NODE_COMMIT}
     DETAILED_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${DETAILED_TAG}
     docker tag ${DOCKER_IMAGE_NAME}:${target} ${DETAILED_IMAGE}
     docker push ${DOCKER_IMAGE_NAME}:${target}
