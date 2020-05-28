@@ -30,7 +30,11 @@ jobs:
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_SRC_TARGETS: "src src-build"
         DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive"
+        #APT_PACKAGES: "git"
+        #APT_ARGS: "-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
+        #apt update -qq && apt install ${APT_ARGS} ${APT_PACKAGES}
       run: |
+        docker login
         curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
         ln -s $PWD/baids ~/.baids/functions.d/docker-cardano-node
         source ~/.baids/baids
