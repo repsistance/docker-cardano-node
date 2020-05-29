@@ -38,6 +38,9 @@ function guild-ops-ptn0-setup() {
   cat ${GUILD_OPS_HOME}/files/ptn0/files/genesis.json | jq '.' > ${CNODE_GENESIS_FILE}
   cat ${GUILD_OPS_HOME}/files/ptn0/files/topology.json | jq '.' > ${CNODE_TOPOLOGY_FILE}
 
+  # workaround to make guild-ops cntools work
+  ln -s ${CNODE_CONFIG_FILE} ${CNODE_HOME}/files/cnode_ptn.yaml
+
 }
 
 function guild-ops-ptn0-cnode-run-as-passive() {
