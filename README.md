@@ -1,3 +1,19 @@
+# guild-operators/hptn0
+
+## Run passive node
+
+```
+docker run -it --rm rcmorano/cardano-node:guild-ops-ptn0-passive
+```
+
+# iohk/fftn0
+
+## Run passive node
+
+```
+docker run -it --rm rcmorano/cardano-node:iohk-fftn-passive
+```
+
 # ARM
 
 ## Build
