@@ -1,0 +1,26 @@
+version: '3.7'
+services:
+  passive:
+    restart: unless-stopped
+    image: rcmorano/cardano-node:standalone-tn-passive
+    ports:
+      - "54321:54321"
+    environment:
+      - CNODE_PORT=54321
+    volumes:
+      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/priv:/opt/cardano/cnode/priv
+      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/db:/opt/cardano/cnode/db
+      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/logs:/opt/cardano/cnode/logs
+      - ${PWD}/baids:/nonexistent/.baids/functions.d
+  leader:
+    restart: unless-stopped
+    image: rcmorano/cardano-node:standalone-tn-leader
+    ports:
+      - "54321:54321"
+    environment:
+      - CNODE_PORT=54321
+    volumes:
+      - ${PWD}/data/standalone-tn/leader/opt/cardano/cnode/priv:/opt/cardano/cnode/priv
+      - ${PWD}/data/standalone-tn/leader/opt/cardano/cnode/db:/opt/cardano/cnode/db
+      - ${PWD}/data/standalone-tn/leader/opt/cardano/cnode/logs:/opt/cardano/cnode/logs
+      - ${PWD}/baids:/nonexistent/.baids/functions.d

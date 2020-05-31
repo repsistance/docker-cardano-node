@@ -1,0 +1,81 @@
+#!/bin/bash
+
+function standalone-tn-init() {
+
+  test -z "$GUILD_OPS_BRANCH"         && export GUILD_OPS_BRANCH=master
+  test -z "$GUILD_OPS_GIT_REPO"       && export GUILD_OPS_GIT_REPO=https://github.com/cardano-community/guild-operators.git
+  test -z "$GUILD_OPS_HOME"           && export GUILD_OPS_HOME=/opt/cardano/guild-operators
+  test -z "$CNODE_BRANCH"             && export CNODE_BRANCH=master
+  test -z "$CNODE_HOME"               && export CNODE_HOME=/opt/cardano/cnode
+  test -z "$CNODE_DB_PATH"            && export CNODE_DB_PATH=/opt/cardano/cnode/db
+  test -z "$CNODE_CONFIG_FILE"        && export CNODE_CONFIG_FILE=${CNODE_HOME}/files/configuration.yaml
+  test -z "$CNODE_GENESIS_FILE"       && export CNODE_GENESIS_FILE=${CNODE_HOME}/files/genesis.json
+  test -z "$CNODE_TOPOLOGY_FILE"      && export CNODE_TOPOLOGY_FILE=${CNODE_HOME}/files/topology.json
+  test -z "$CNODE_PORT"               && export CNODE_PORT=54321
+  test -z "$CNODE_HOST_ADDR"          && export CNODE_HOST_ADDR=$(curl ifconfig.co)
+  test -z "$SIGNING_KEY"              && export SIGNING_KEY=${CNODE_HOME}/priv/pbft0.key
+  test -z "$VRF_KEY"                  && export VRF_KEY=${CNODE_HOME}/priv/pbft0.vrf
+  test -z "$CERT_KEY"                 && export CERT_KEY=${CNODE_HOME}/priv/pbft0.cert
+  test -z "$CARDANO_NODE_SOCKET_PATH" && export CARDANO_NODE_SOCKET_PATH=${CNODE_HOME}/sockets/node0.socket
+  test -z "$PROTOCOL_MAGIC"           && export PROTOCOL_MAGIC=42
+
+}
+
+
+function standalone-tn-setup() {
+
+  standalone-tn-init
+
+  for dir in files db logs sockets priv
+  do
+    mkdir -p ${CNODE_HOME}/${dir}
+  done
+  
+  git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME}
+
+  ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
+  cp -a ${GUILD_OPS_HOME}/files/ptn0/files/ptn0.yaml ${CNODE_CONFIG_FILE}
+
+  cat > ${CNODE_TOPOLOGY_FILE}.leader <<EOF
+{
+  "Producers": [
+    {
+      "addr": "passive",
+      "port": ${CNODE_PORT},
+      "valency": 1
+    }
+  ]
+}
+EOF
+  cat > ${CNODE_TOPOLOGY_FILE}.passive <<EOF
+{
+  "Producers": [
+    {
+      "addr": "leader",
+      "port": ${CNODE_PORT},
+      "valency": 1
+    }
+  ]
+}
+EOF
+
+  # workaround to make guild-ops cntools work
+  ln -s ${CNODE_CONFIG_FILE} ${CNODE_HOME}/files/cnode_ptn.yaml
+
+}
+
+function standalone-tn-cnode-run-as-passive() {
+
+  standalone-tn-init
+
+  test -e ${SIGNING_KEY} || cardano-cli keygen --real-pbft --secret ${SIGNING_KEY} --no-password
+  test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
+
+  cardano-node run \
+    --config ${CNODE_CONFIG_FILE} \
+    --database-path ${CNODE_DB_PATH} \
+    --host-addr ${CNODE_HOST_ADDR} \
+    --port ${CNODE_PORT} \
+    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
+
+}

@@ -24,6 +24,17 @@ USER nobody
 RUN curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
 COPY baids/* /nonexistent/.baids/functions.d/
 USER nobody
+## standalone images (no genesis/topology prefetched)
+FROM base AS standalone-tn-base
+ENV NETWORK=standalone-tn
+RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
+USER root
+RUN apt-get remove -y ${BUILD_PACKAGES} && apt-get autoremove -y && apt-get clean -y
+CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
+FROM standalone-tn-base AS standalone-tn-passive
+ENV CNODE_ROLE=passive
+FROM standalone-tn-base AS standalone-tn-leader
+ENV CNODE_ROLE=leader
 ## guild-ops images
 FROM base AS guild-ops-ptn0-base
 ENV NETWORK=guild-ops-ptn0
