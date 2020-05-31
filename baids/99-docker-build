@@ -43,7 +43,7 @@ function cardano-node-docker-build() {
   for target in ${DOCKER_FINAL_TARGETS}
   do
     BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}
-    docker pull ${BUILD_IMAGE}
+    docker pull ${BUILD_IMAGE} || true
     docker build \
       --cache-from ${BUILD_IMAGE} \
       --build-arg CARDANO_NODE_COMMIT=${CARDANO_NODE_COMMIT} \
