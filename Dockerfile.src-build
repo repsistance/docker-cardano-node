@@ -1,6 +1,6 @@
 ARG CARDANO_NODE_COMMIT=master
 
-FROM rcmorano/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
+FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 
 FROM ubuntu:20.04 AS src-build
 
