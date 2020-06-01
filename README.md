@@ -1,3 +1,26 @@
+# 2-node standalone testnet/chain
+
+* Setup config/topology on docker-compose data volume
+```
+docker-compose -f docker-compose.yml-standalone-tn run --rm \
+  --user nobody \
+  --entrypoint bash \
+  leader.local \
+  -c 'source ~/.baids/baids; \
+  standalone-tn-setup-config; \
+  standalone-tn-setup-topology'
+```
+* Bring up the leader
+```
+docker-compose -f docker-compose.yml-standalone-tn up -d leader.local
+```
+
+* Wait for genesis startTime (~ 30s :) and bring up the relay
+```
+sleep 30
+docker-compose -f docker-compose.yml-standalone-tn up -d passive.local
+```
+
 # guild-operators/hptn0
 
 ## Run passive node
