@@ -23,6 +23,7 @@ COPY --from=src-build /output/cardano* /usr/local/bin/
 USER nobody
 RUN curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
 COPY baids/* /nonexistent/.baids/functions.d/
+COPY ./assets /assets
 USER nobody
 ## standalone images (no genesis/topology prefetched)
 FROM base AS standalone-tn-base
