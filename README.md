@@ -1,7 +1,8 @@
 # 2-node standalone testnet/chain
 
-* Setup config/topology on docker-compose data volume
+* Run
 ```
+# Setup config/topology on docker-compose data volume
 docker-compose -f docker-compose.yml-standalone-tn run --rm \
   --user nobody \
   --entrypoint bash \
@@ -9,16 +10,17 @@ docker-compose -f docker-compose.yml-standalone-tn run --rm \
   -c 'source ~/.baids/baids; \
   standalone-tn-setup-config; \
   standalone-tn-setup-topology'
-```
-* Bring up the leader
-```
+# Bring up the leader
 docker-compose -f docker-compose.yml-standalone-tn up -d leader.local
-```
-
-* Wait for genesis startTime (~ 30s :) and bring up the relay
-```
+# Wait for genesis startTime (~ 30s :) and bring up the relay
 sleep 30
 docker-compose -f docker-compose.yml-standalone-tn up -d passive.local
+```
+
+* Check
+```
+docker-compose -f docker-compose.yml-standalone-tn exec leader.local cardano-cli get-tip --testnet-magic 42
+docker-compose -f docker-compose.yml-standalone-tn exec passive.local cardano-cli get-tip --testnet-magic 42
 ```
 
 # guild-operators/hptn0
