@@ -2,22 +2,30 @@
 
 function standalone-tn-init() {
 
-  test -z "$GUILD_OPS_BRANCH"         && export GUILD_OPS_BRANCH=master
-  test -z "$GUILD_OPS_GIT_REPO"       && export GUILD_OPS_GIT_REPO=https://github.com/cardano-community/guild-operators.git
-  test -z "$GUILD_OPS_HOME"           && export GUILD_OPS_HOME=/opt/cardano/guild-operators
-  test -z "$CNODE_BRANCH"             && export CNODE_BRANCH=master
-  test -z "$CNODE_HOME"               && export CNODE_HOME=/opt/cardano/cnode
-  test -z "$CNODE_DB_PATH"            && export CNODE_DB_PATH=/opt/cardano/cnode/db
-  test -z "$CNODE_CONFIG_FILE"        && export CNODE_CONFIG_FILE=${CNODE_HOME}/files/configuration.yaml
-  test -z "$CNODE_GENESIS_FILE"       && export CNODE_GENESIS_FILE=${CNODE_HOME}/files/genesis.json
-  test -z "$CNODE_TOPOLOGY_FILE"      && export CNODE_TOPOLOGY_FILE=${CNODE_HOME}/files/topology.json
-  test -z "$CNODE_PORT"               && export CNODE_PORT=54321
-  test -z "$CNODE_HOST_ADDR"          && export CNODE_HOST_ADDR=$(curl ifconfig.co)
-  test -z "$SIGNING_KEY"              && export SIGNING_KEY=${CNODE_HOME}/priv/pbft0.key
-  test -z "$VRF_KEY"                  && export VRF_KEY=${CNODE_HOME}/priv/pbft0.vrf
-  test -z "$CERT_KEY"                 && export CERT_KEY=${CNODE_HOME}/priv/pbft0.cert
-  test -z "$CARDANO_NODE_SOCKET_PATH" && export CARDANO_NODE_SOCKET_PATH=${CNODE_HOME}/sockets/node0.socket
-  test -z "$PROTOCOL_MAGIC"           && export PROTOCOL_MAGIC=42
+  # misc env vars
+  test -z "${GUILD_OPS_BRANCH+x}"         && export GUILD_OPS_BRANCH=master
+  test -z "${GUILD_OPS_GIT_REPO+x}"       && export GUILD_OPS_GIT_REPO=https://github.com/cardano-community/guild-operators.git
+  test -z "${GUILD_OPS_HOME+x}"           && export GUILD_OPS_HOME=/opt/cardano/guild-operators
+  # cardano-node related vars
+  test -z "${CNODE_BRANCH+x}"             && export CNODE_BRANCH=master
+  test -z "${CNODE_HOME+x}"               && export CNODE_HOME=/opt/cardano/cnode
+  test -z "${CNODE_DB_PATH+x}"            && export CNODE_DB_PATH=/opt/cardano/cnode/db
+  test -z "${CNODE_CONFIG_FILE+x}"        && export CNODE_CONFIG_FILE=${CNODE_HOME}/files/configuration.yaml
+  test -z "${CNODE_GENESIS_DIR+x}"        && export CNODE_GENESIS_DIR=${CNODE_HOME}/files
+  test -z "${CNODE_GENESIS_FILE+x}"       && export CNODE_GENESIS_FILE=${CNODE_GENESIS_DIR}/genesis.json
+  test -z "${CNODE_TOPOLOGY_FILE+x}"      && export CNODE_TOPOLOGY_FILE=${CNODE_HOME}/files/topology.json
+  test -z "${CNODE_PORT+x}"               && export CNODE_PORT=54321
+  test -z "${CNODE_HOST_ADDR+x}"          && export CNODE_HOST_ADDR=$(curl -s ifconfig.me)
+  test -z "${CARDANO_NODE_SOCKET_PATH+x}" && export CARDANO_NODE_SOCKET_PATH=${CNODE_HOME}/sockets/node0.socket
+  # key related vars
+  test -z "${VRF_VKEY+x}"                 && export VRF_VKEY=${CNODE_HOME}/priv/vrf.vkey
+  test -z "${VRF_SKEY+x}"                 && export VRF_SKEY=${CNODE_HOME}/priv/vrf.skey
+  test -z "${KES_VKEY+x}"                 && export KES_VKEY=${CNODE_HOME}/priv/kes.vkey
+  test -z "${KES_SKEY+x}"                 && export KES_SKEY=${CNODE_HOME}/priv/kes.skey
+  test -z "${CNODE_CERT+x}"               && export CNODE_CERT=${CNODE_HOME}/priv/cert
+  # chain related vars
+  test -z "${NETWORK_MAGIC+x}"           && export NETWORK_MAGIC=4242
+  test -z "${LOVELACE_SUPPLY+x}"          && export LOVELACE_SUPPLY=1000000000
 
 }
 
@@ -34,13 +42,35 @@ function standalone-tn-setup() {
   git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME}
 
   ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
-  cp -a ${GUILD_OPS_HOME}/files/ptn0/files/ptn0.yaml ${CNODE_CONFIG_FILE}
 
+  test -e ${CNODE_CONFIG_FILE} || \
+    standalone-tn-setup-config
+
+  test -e ${CNODE_TOPOLOGY_FILE} || \
+    standalone-tn-setup-topology
+
+}
+
+function standalone-tn-setup-config() {
+
+  standalone-tn-init
+
+  cp -a /assets/configuration.yaml ${CNODE_CONFIG_FILE}
+  # workaround to make guild-ops' cntools work
+  ln -nfs ${CNODE_CONFIG_FILE} ${CNODE_HOME}/files/cnode_ptn.yaml
+
+}
+
+function standalone-tn-setup-topology() {
+
+  standalone-tn-init
+
+  # TODO: sd?
   cat > ${CNODE_TOPOLOGY_FILE}.leader <<EOF
 {
   "Producers": [
     {
-      "addr": "passive",
+      "addr": "passive.local",
       "port": ${CNODE_PORT},
       "valency": 1
     }
@@ -51,7 +81,7 @@ EOF
 {
   "Producers": [
     {
-      "addr": "leader",
+      "addr": "leader.local",
       "port": ${CNODE_PORT},
       "valency": 1
     }
@@ -59,8 +89,59 @@ EOF
 }
 EOF
 
-  # workaround to make guild-ops cntools work
-  ln -s ${CNODE_CONFIG_FILE} ${CNODE_HOME}/files/cnode_ptn.yaml
+}
+
+function standalone-tn-bootstrap-chain() {
+
+  standalone-tn-init
+  # NOTE: https://github.com/input-output-hk/cardano-node/blob/master/doc/shelley-genesis.md
+  # create genesis file and spec
+  cardano-cli shelley genesis create \
+    --testnet-magic ${NETWORK_MAGIC} \
+    --genesis-dir ${CNODE_GENESIS_DIR}
+  # lets create keys!
+  for key in {1..2}
+  do
+    # create a couple of genesis key pairs
+    cardano-cli shelley genesis key-gen-genesis \
+      --verification-key-file ${CNODE_GENESIS_DIR}/genesis-keys/genesis${key}.vkey \
+      --signing-key-file ${CNODE_GENESIS_DIR}/genesis-keys/genesis${key}.skey
+    # create a couple of genesis delegate key pairs
+    cardano-cli shelley genesis key-gen-delegate \
+      --verification-key-file ${CNODE_GENESIS_DIR}/delegate-keys/delegate${key}.vkey \
+      --signing-key-file ${CNODE_GENESIS_DIR}/delegate-keys/delegate${key}.skey \
+      --operational-certificate-issue-counter ${CNODE_GENESIS_DIR}/delegate-keys/delegate-opcert${key}.counter
+    # create a couple of initial utxos
+    cardano-cli shelley genesis key-gen-utxo \
+      --verification-key-file ${CNODE_GENESIS_DIR}/utxo-keys/utxo${key}.vkey \
+      --signing-key-file ${CNODE_GENESIS_DIR}/utxo-keys/utxo${key}.skey
+  done
+
+  # And finally, fill the genesis with the keys
+  cardano-cli shelley genesis create \
+    --testnet-magic ${NETWORK_MAGIC} \
+    --genesis-dir ${CNODE_GENESIS_DIR} \
+    --supply ${LOVELACE_SUPPLY}
+
+}
+
+function standalone-tn-generate-cnode-keys() {
+
+  # Generate KES Keys
+  cardano-cli shelley node key-gen-KES \
+      --verification-key-file ${KES_VKEY} \
+      --signing-key-file ${KES_SKEY}
+  # Generate VRF Keys
+  cardano-cli shelley node key-gen-VRF \
+      --verification-key-file ${VRF_VKEY} \
+      --signing-key-file ${VRF_SKEY}
+  # Issuing an operational certificate
+  cardano-cli shelley node issue-op-cert \
+      --hot-kes-verification-key-file ${KES_VKEY} \
+      --cold-signing-key-file ${CNODE_GENESIS_DIR}/delegate-keys/delegate${CNODE_KEY_NUMBER}.skey \
+      --operational-certificate-issue-counter ${CNODE_GENESIS_DIR}/delegate-keys/delegate-opcert${CNODE_KEY_NUMBER}.counter \
+      --kes-period 0 \
+      --out-file ${CNODE_CERT}
 
 }
 
@@ -68,14 +149,34 @@ function standalone-tn-cnode-run-as-passive() {
 
   standalone-tn-init
 
-  test -e ${SIGNING_KEY} || cardano-cli keygen --real-pbft --secret ${SIGNING_KEY} --no-password
-  test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
+  test -e ${CNODE_CERT} || standalone-tn-generate-cnode-keys
 
   cardano-node run \
     --config ${CNODE_CONFIG_FILE} \
+    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \
     --database-path ${CNODE_DB_PATH} \
+    --socket-path ${CARDANO_NODE_SOCKET_PATH} \
+    --host-addr ${CNODE_HOST_ADDR} \
+    --port ${CNODE_PORT}
+
+}
+
+function standalone-tn-cnode-run-as-leader() {
+
+  standalone-tn-init
+
+  test -e ${CNODE_GENESIS_FILE} || standalone-tn-bootstrap-chain
+  test -e ${CNODE_CERT} || standalone-tn-generate-cnode-keys
+
+  cardano-node run \
+    --config ${CNODE_CONFIG_FILE} \
+    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \
+    --database-path ${CNODE_DB_PATH} \
+    --socket-path ${CARDANO_NODE_SOCKET_PATH} \
     --host-addr ${CNODE_HOST_ADDR} \
     --port ${CNODE_PORT} \
-    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
+    --shelley-kes-key ${KES_SKEY} \
+    --shelley-vrf-key ${VRF_SKEY} \
+    --shelley-operational-certificate ${CNODE_CERT}
 
 }
