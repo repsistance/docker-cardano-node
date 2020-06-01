@@ -1,26 +1,33 @@
 version: '3.7'
 services:
-  passive:
+  leader.local:
     restart: unless-stopped
-    image: rcmorano/cardano-node:standalone-tn-passive
-    ports:
-      - "54321:54321"
+    image: repsistance/cardano-node:standalone-tn-leader
+    #ports:
+    #  - "54321:54321"
     environment:
+      - CNODE_HOST_ADDR=0.0.0.0
       - CNODE_PORT=54321
+      - CNODE_KEY_NUMBER=1
+    #entrypoint: /bin/bash -c 'while true; do sleep 6969; done'
     volumes:
-      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/priv:/opt/cardano/cnode/priv
-      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/db:/opt/cardano/cnode/db
-      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/logs:/opt/cardano/cnode/logs
-      - ${PWD}/baids:/nonexistent/.baids/functions.d
-  leader:
-    restart: unless-stopped
-    image: rcmorano/cardano-node:standalone-tn-leader
-    ports:
-      - "54321:54321"
-    environment:
-      - CNODE_PORT=54321
-    volumes:
+      - ${PWD}/data/standalone-tn/genesis-dir:/opt/cardano/cnode/files
       - ${PWD}/data/standalone-tn/leader/opt/cardano/cnode/priv:/opt/cardano/cnode/priv
       - ${PWD}/data/standalone-tn/leader/opt/cardano/cnode/db:/opt/cardano/cnode/db
       - ${PWD}/data/standalone-tn/leader/opt/cardano/cnode/logs:/opt/cardano/cnode/logs
+      - ${PWD}/baids:/nonexistent/.baids/functions.d
+  passive.local:
+    restart: unless-stopped
+    image: repsistance/cardano-node:standalone-tn-passive
+    #ports:
+    #  - "54322:54322"
+    environment:
+      - CNODE_HOST_ADDR=0.0.0.0
+      - CNODE_PORT=54321
+      - CNODE_KEY_NUMBER=2
+    volumes:
+      - ${PWD}/data/standalone-tn/genesis-dir:/opt/cardano/cnode/files
+      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/priv:/opt/cardano/cnode/priv
+      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/db:/opt/cardano/cnode/db
+      - ${PWD}/data/standalone-tn/passive/opt/cardano/cnode/logs:/opt/cardano/cnode/logs
       - ${PWD}/baids:/nonexistent/.baids/functions.d
