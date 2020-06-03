@@ -23,7 +23,7 @@ function guild-ops-ptn0-init() {
   test -z "${VRF_SKEY+x}"                 && export VRF_SKEY=${CNODE_HOME}/priv/pool/${POOL_NAME}/vrf.skey
   test -z "${KES_VKEY+x}"                 && export KES_VKEY=${CNODE_HOME}/priv/pool/${POOL_NAME}/hot.vkey
   test -z "${KES_SKEY+x}"                 && export KES_SKEY=${CNODE_HOME}/priv/pool/${POOL_NAME}/hot.skey
-  test -z "${CNODE_CERT+x}"               && export CNODE_CERT=${CNODE_HOME}/priv/${POOL_NAME}/op.cert
+  test -z "${CNODE_CERT+x}"               && export CNODE_CERT=${CNODE_HOME}/priv/pool/${POOL_NAME}/op.cert
   # chain related vars
   test -z "${NETWORK_MAGIC+x}"            && export NETWORK_MAGIC=$(jq -r .networkMagic ${CNODE_GENESIS_FILE} 2> /dev/null)
   test -z "${LOVELACE_SUPPLY+x}"          && export LOVELACE_SUPPLY=1000000000
