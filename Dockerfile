@@ -17,7 +17,8 @@ RUN mkdir -p /nonexistent /data && \
     chown nobody: /nonexistent && \
     mkdir -p ${CNODE_HOME} && \
     chown -R nobody: ${CNODE_HOME}/..
-RUN apt-get update -qq && apt-get install ${APT_ARGS} ${BASE_PACKAGES} ${BUILD_PACKAGES} && \
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install ${APT_ARGS} ${BASE_PACKAGES} ${BUILD_PACKAGES} && \
     pip3 install yq
 COPY --from=src-build /output/cardano* /usr/local/bin/
 USER nobody
