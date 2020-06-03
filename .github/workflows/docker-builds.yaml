@@ -30,7 +30,7 @@ jobs:
         DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/cardano-node
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_SRC_TARGETS: "src src-build"
-        DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive standalone-tn-passive standalone-tn-leader"
+        DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive guild-ops-ptn0-leader iohk-fftn-passive iohk-fftn-leader  standalone-tn-passive standalone-tn-leader"
         #APT_PACKAGES: "git"
         #APT_ARGS: "-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
         #apt update -qq && apt install ${APT_ARGS} ${APT_PACKAGES}
@@ -41,6 +41,7 @@ jobs:
         set -x
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
+        export CARDANO_NODE_COMMIT=1c79736
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
         cardano-node-docker-build
         cardano-node-docker-push
