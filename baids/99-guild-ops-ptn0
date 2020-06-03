@@ -81,7 +81,7 @@ function guild-ops-ptn0-cnode-run-as-passive() {
     --database-path ${CNODE_DB_PATH} \
     --host-addr ${CNODE_HOST_ADDR} \
     --port ${CNODE_PORT} \
-    --topology ${CNODE_TOPOLOGY_FILE}
+    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
 
 }
 
