@@ -80,6 +80,8 @@ function iohk-fftn-setup-topology() {
 }
 EOF
 
+  ln -s ${CNODE_TOPOLOGY_FILE} ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
+
 }
 
 function iohk-fftn-cnode-run-as-passive() {

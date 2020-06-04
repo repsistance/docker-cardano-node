@@ -70,6 +70,8 @@ function guild-ops-ptn0-setup-topology() {
   
   cat ${GUILD_OPS_HOME}/files/ptn0/files/topology.json | jq '.' > ${CNODE_TOPOLOGY_FILE}
 
+  ln -s ${CNODE_TOPOLOGY_FILE} ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
+
 }
 
 function guild-ops-ptn0-cnode-run-as-passive() {
