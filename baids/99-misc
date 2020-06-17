@@ -13,3 +13,21 @@ function cardano-node-get-git-branch-head() {
   git ls-remote ${GIT_REPO_URI} ${GIT_REPO_BRANCH} | awk '{print $1}'
 
 }
+
+function cardano-node-generate-grafana-panels() {
+
+  for metric in cardano_node_BlockFetchDecision_peers_connectedPeers_int cardano_node_metrics_upTime_ns ekg_server_timestamp_ms rts_gc_bytes_allocated rts_gc_bytes_copied rts_gc_cpu_ms rts_gc_cumulative_bytes_used rts_gc_current_bytes_slop rts_gc_current_bytes_used rts_gc_gc_cpu_ms rts_gc_gc_wall_ms rts_gc_init_cpu_ms rts_gc_init_wall_ms rts_gc_max_bytes_slop rts_gc_max_bytes_used rts_gc_mutator_cpu_ms rts_gc_mutator_wall_ms rts_gc_num_bytes_usage_samples rts_gc_num_gcs rts_gc_par_avg_bytes_copied rts_gc_par_max_bytes_copied rts_gc_par_tot_bytes_copied rts_gc_peak_megabytes_allocated rts_gc_wall_ms; do sed "s|_METRIC_NAME_|$metric|g" /tmp/tpl | sed "s|_TITLE_|$(echo $metric | sed 's|_|-|g')|g" > /tmp/PANEL_${metric}.json; done
+
+}
+
+function cardano-node-startup-probe() {
+
+  CONNECTED_PEERS=$(curl -s localhost:13788/metrics | grep -i conn.*peer | awk '{print $NF}')
+  if [ ${CONNECTED_PEERS} -gt 0 ]
+  then
+    exit 0
+  else
+    exit 1
+  fi
+
+}
