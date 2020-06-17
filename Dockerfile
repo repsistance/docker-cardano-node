@@ -3,6 +3,18 @@ ARG CARDANO_NODE_COMMIT=master
 FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
 
+# misc
+## nixos assets
+FROM nixos/nix AS github-nix-assets
+RUN nix-env -iA nixpkgs.curl
+RUN curl -s https://raw.githubusercontent.com/input-output-hk/cardano-ops/master/topologies/ff-peers.nix \
+      | nix-instantiate --eval --json --strict - > /var/tmp/ff-peers.json
+## Dockerfile.src
+FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
+## Dockerfile.src-build
+FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
+
+
 # production base
 FROM ubuntu:20.04 AS base
 ENV APT_ARGS="-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
@@ -30,6 +42,7 @@ USER nobody
 FROM base AS standalone-tn-base
 ENV NETWORK=standalone-tn
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
+COPY --from=github-nix-assets /var/tmp/ff-peers.json /opt/cardano/cnode/files/ff-peers.json
 USER root
 RUN apt-get remove -y ${BUILD_PACKAGES} && apt-get autoremove -y && apt-get clean -y
 CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
