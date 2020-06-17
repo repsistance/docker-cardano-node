@@ -6,10 +6,10 @@ FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 ## Dockerfile.src-build
 FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
 ## nixos assets
-FROM nixos/nix AS github-nix-assets
-RUN nix-env -iA nixpkgs.curl
-RUN curl -s https://raw.githubusercontent.com/input-output-hk/cardano-ops/master/topologies/ff-peers.nix \
-      | nix-instantiate --eval --json - > /var/tmp/ff-peers.json
+#FROM nixos/nix AS github-nix-assets
+#RUN nix-env -iA nixpkgs.curl
+#RUN curl -s https://raw.githubusercontent.com/input-output-hk/cardano-ops/master/topologies/ff-peers.nix \
+#      | nix-instantiate --eval --json - > /var/tmp/ff-peers.json
 
 # production base
 FROM ubuntu:20.04 AS base
@@ -38,7 +38,7 @@ USER nobody
 FROM base AS standalone-tn-base
 ENV NETWORK=standalone-tn
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
-COPY --from=github-nix-assets /var/tmp/ff-peers.json /opt/cardano/cnode/files/ff-peers.json
+#COPY --from=github-nix-assets /var/tmp/ff-peers.json /opt/cardano/cnode/files/ff-peers.json
 USER root
 RUN apt-get remove -y ${BUILD_PACKAGES} && apt-get autoremove -y && apt-get clean -y
 CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
