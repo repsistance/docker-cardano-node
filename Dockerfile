@@ -1,10 +1,15 @@
 ARG CARDANO_NODE_COMMIT=master
 
+# misc
 ## Dockerfile.src
 FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 ## Dockerfile.src-build
 FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
-
+## nixos assets
+FROM nixos/nix AS github-nix-assets
+RUN nix-env -iA nixpkgs.curl
+RUN curl -s https://raw.githubusercontent.com/input-output-hk/cardano-ops/master/topologies/ff-peers.nix \
+      | nix-instantiate --eval --json - > /var/tmp/ff-peers.json
 
 # production base
 FROM ubuntu:20.04 AS base
@@ -64,12 +69,6 @@ ENV CNODE_ROLE=passive
 FROM iohk-fftn-base AS iohk-fftn-leader
 ENV CNODE_ROLE=leader
 
-# misc
-## nixos assets
-FROM nixos/nix AS github-nix-assets
-RUN nix-env -iA nixpkgs.curl
-RUN curl -s https://raw.githubusercontent.com/input-output-hk/cardano-ops/master/topologies/ff-peers.nix \
-      | nix-instantiate --eval --json - > /var/tmp/ff-peers.json
 ## distroless poc
 FROM gcr.io/distroless/base AS barebone-node
 COPY --from=src-build /output/cardano* /usr/local/bin/
