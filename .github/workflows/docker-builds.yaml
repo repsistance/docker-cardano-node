@@ -45,4 +45,4 @@ jobs:
         export CARDANO_NODE_COMMIT=f28c578
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
         cardano-node-docker-build
-        #cardano-node-docker-push
+        cardano-node-docker-push
