@@ -25,7 +25,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: build-n-push
       env:
-        CARDANO_NODE_BUILD_BRANCH: master
+        CARDANO_NODE_BUILD_BRANCH: 1.13.0-rewards
         DOCKER_REGISTRY: docker.io
         DOCKER_IMAGE_NAME: repsistance/cardano-node
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
