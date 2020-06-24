@@ -58,15 +58,15 @@ ENV CNODE_ROLE=passive
 FROM guild-ops-ptn0-base AS guild-ops-ptn0-leader
 ENV CNODE_ROLE=leader
 ## iohk images
-FROM base AS iohk-fftn-base
-ENV NETWORK=iohk-fftn
+FROM base AS iohk-stn-base
+ENV NETWORK=iohk-stn
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
 USER root
 RUN apt-get remove -y ${BUILD_PACKAGES} && apt-get autoremove -y && apt-get clean -y
 CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
-FROM iohk-fftn-base AS iohk-fftn-passive
+FROM iohk-stn-base AS iohk-stn-passive
 ENV CNODE_ROLE=passive
-FROM iohk-fftn-base AS iohk-fftn-leader
+FROM iohk-stn-base AS iohk-stn-leader
 ENV CNODE_ROLE=leader
 
 ## distroless poc

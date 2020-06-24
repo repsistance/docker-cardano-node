@@ -6,19 +6,26 @@ FROM ubuntu:20.04 AS src-build
 
 ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
 ARG CABAL_TARGETS="cardano-node cardano-cli"
+ARG STACK_URL="https://www.stackage.org/stack/linux-x86_64"
+ENV STACK_URL ${STACK_URL}
 WORKDIR /src
 
 RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg build-essential pkg-config ghc cabal-install git libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev libsodium-dev pkg-config
+    DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg build-essential pkg-config ghc cabal-install git libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev libsodium-dev pkg-config && \
+    curl -sLo /tmp/stack.tgz ${STACK_URL} && \
+    tar -zxf /tmp/stack.tgz -C /tmp && \
+    mv /tmp/stack-*/stack /usr/local/bin && \
+    chmod +x /usr/local/bin/stack
 
 COPY --from=src /src /src
 RUN echo -e "package cardano-crypto-praos\n  flags: -external-libsodium-vrf" > cabal.project.local && \
-    cabal update && \
-    for target in ${CABAL_TARGETS}; do cabal new-build ${target}; done
-
-# TODO: there is probably a better way to extract/install binaries
-RUN mkdir /output && \
-    find dist-newstyle/build -type f -executable | grep -v ".so$" | while read bin; \
-    do \
-      cp -a ${PWD}/$bin /output; \
-    done
+    stack build --test --no-run-tests --copy-bins --local-bin-path /usr/local/bin
+#    cabal update && \
+#    for target in ${CABAL_TARGETS}; do cabal new-build ${target}; done
+#
+## TODO: there is probably a better way to extract/install binaries
+#RUN mkdir /output && \
+#    find dist-newstyle/build -type f -executable | grep -v ".so$" | while read bin; \
+#    do \
+#      cp -a ${PWD}/$bin /output; \
+#    done
