@@ -18,8 +18,10 @@ FROM ubuntu:20.04 AS base
 ENV APT_ARGS="-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
 ARG BASE_PACKAGES="git bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent"
 ENV BASE_PACKAGES ${BASE_PACKAGES}
-#ARG BUILD_PACKAGES="git"
-#ENV BUILD_PACKAGES ${BUILD_PACKAGES}
+ENV GUILD_OPS_BRANCH master
+ENV GUILD_OPS_GIT_REPO https://github.com/cardano-community/guild-operators.git
+ENV GUILD_OPS_HOME /opt/cardano/guild-operators
+
 VOLUME ["/opt/cardano/cnode/logs", "/opt/cardano/cnode/db", "/opt/cardano/cnode/priv"]
 ENV CNODE_HOME /opt/cardano/cnode
 ENV CARDANO_NODE_SOCKET_PATH /opt/cardano/cnode/sockets/node0.socket
@@ -29,7 +31,9 @@ RUN mkdir -p /nonexistent /data && \
     chown -R nobody: ${CNODE_HOME}/..
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install ${APT_ARGS} ${BASE_PACKAGES} ${BUILD_PACKAGES} && \
-    pip3 install yq
+    pip3 install yq && \
+    git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME}
+
 COPY --from=bin-build /output/cardano* /usr/local/bin/
 USER nobody
 RUN curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install

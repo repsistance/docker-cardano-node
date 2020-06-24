@@ -1,6 +1,5 @@
 #!/bin/bash
 
-function iohk-stn-init() {
 
   # misc env vars
   test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=byron-staging
@@ -48,8 +47,6 @@ function iohk-stn-setup() {
     mkdir -p ${CNODE_HOME}/${dir}
   done
   
-  git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME}
-
   ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
 
   curl https://raw.githubusercontent.com/input-output-hk/iohk-nix/${CNODE_BRANCH}/cardano-lib/ff-genesis.json | jq '.' > ${CNODE_GENESIS_FILE}
