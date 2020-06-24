@@ -2,12 +2,12 @@
 
 function cardano-node-docker-init() {
 
-  CARDANO_NODE_COMMIT=master
-  DOCKER_REPOSITORY=registry.local:5000
-  DOCKER_IMAGE_NAME=rcmorano/cardano-node
-  DOCKER_IMAGE_URI=${DOCKER_REPOSITORY}/${DOCKER_IMAGE_NAME}
-  DOCKER_SRC_TARGETS="src src-build"
-  DOCKER_FINAL_TARGETS="guild-ops-ptn0-passive iohk-fftn-passive"
+  test -z "${CARDANO_NODE_COMMIT+x}" && CARDANO_NODE_COMMIT=master
+  test -z "${DOCKER_REPOSITORY+x}" && DOCKER_REPOSITORY=registry.local:5000
+  test -z "${DOCKER_IMAGE_NAME+x}" && DOCKER_IMAGE_NAME=rcmorano/cardano-node
+  test -z "${DOCKER_IMAGE_URI+x}" && DOCKER_IMAGE_URI=${DOCKER_REPOSITORY}/${DOCKER_IMAGE_NAME}
+  test -z "${DOCKER_SRC_TARGETS+x}" && DOCKER_SRC_TARGETS="src src-build"
+  test -z "${DOCKER_FINAL_TARGETS+x}" && DOCKER_FINAL_TARGETS="guild-ops-ptn0-passive iohk-stn-passive"
 
 }
 
