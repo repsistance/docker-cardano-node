@@ -5,6 +5,8 @@ ARG CARDANO_NODE_COMMIT=master
 FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 ## Dockerfile.src-build
 FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
+## Dockerfile.bin-build
+FROM repsistance/cardano-node:bin-build AS bin-build
 ## nixos assets
 #FROM nixos/nix AS github-nix-assets
 #RUN nix-env -iA nixpkgs.curl
@@ -28,7 +30,7 @@ RUN mkdir -p /nonexistent /data && \
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install ${APT_ARGS} ${BASE_PACKAGES} ${BUILD_PACKAGES} && \
     pip3 install yq
-COPY --from=src-build /output/cardano* /usr/local/bin/
+COPY --from=bin-build /output/cardano* /usr/local/bin/
 USER nobody
 RUN curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
 COPY baids/* /nonexistent/.baids/functions.d/
