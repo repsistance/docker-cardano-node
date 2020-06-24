@@ -6,3 +6,6 @@ ARG CARDANO_NODE_LINUX_TGZ=https://hydra.iohk.io/build/3185375/download/1/cardan
 RUN mkdir /output && \
     curl -sLo /tmp/cardano-node.tgz ${CARDANO_NODE_LINUX_TGZ} && \
     tar -zxf /tmp/cardano-node.tgz -C /output
+
+# wget -O $CNODE_HOME/files/topology.json https://hydra.iohk.io/job/Cardano/cardano-node/cardano-deployment/latest-finished/download/1/shelley_testnet-topology.json
+#wget -O $CNODE_HOME/files/genesis.json https://hydra.iohk.io/job/Cardano/cardano-node/cardano-deployment/latest-finished/download/1/shelley_testnet-genesis.json

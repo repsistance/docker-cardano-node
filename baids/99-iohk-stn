@@ -108,6 +108,7 @@ function iohk-stn-cnode-run-as-leader() {
 
   iohk-stn-init
 
+  cardano-node --version
   cardano-node run \
     --config ${CNODE_CONFIG_FILE} \
     --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \

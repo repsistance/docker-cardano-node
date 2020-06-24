@@ -48,8 +48,6 @@ function iohk-fftn-setup() {
     mkdir -p ${CNODE_HOME}/${dir}
   done
   
-  git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME}
-
   ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
 
   curl https://raw.githubusercontent.com/input-output-hk/iohk-nix/${CNODE_BRANCH}/cardano-lib/ff-genesis.json | jq '.' > ${CNODE_GENESIS_FILE}
@@ -111,6 +109,7 @@ function iohk-fftn-cnode-run-as-leader() {
 
   iohk-fftn-init
 
+  cardano-node --version
   cardano-node run \
     --config ${CNODE_CONFIG_FILE} \
     --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \
