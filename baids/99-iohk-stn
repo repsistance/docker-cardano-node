@@ -1,5 +1,6 @@
 #!/bin/bash
 
+function iohk-stn-init() {
 
   # misc env vars
   test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=byron-staging
