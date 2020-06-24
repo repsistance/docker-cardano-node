@@ -1,0 +1,12 @@
+diff --git stack.yaml stack.yaml
+index e6e4a499..f0a6d369 100644
+--- stack.yaml
++++ stack.yaml
+@@ -91,6 +91,7 @@ extra-deps:
+       - binary/test
+       - cardano-crypto-class
+       - slotting
++      - cardano-crypto-praos
+ 
+     # Following deps are for cardano-shell
+   - git: https://github.com/input-output-hk/cardano-shell

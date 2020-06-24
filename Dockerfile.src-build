@@ -17,8 +17,10 @@ RUN apt-get update -qq && \
     mv /tmp/stack-*/stack /usr/local/bin && \
     chmod +x /usr/local/bin/stack
 
+COPY ./assets/cardano-node-patches /patches
 COPY --from=src /src /src
 RUN echo -e "package cardano-crypto-praos\n  flags: -external-libsodium-vrf" > cabal.project.local && \
+    for patch in /patches*; do patch -p0 < ${patch}; done && \
     stack build --test --no-run-tests --copy-bins --local-bin-path /usr/local/bin
 #    cabal update && \
 #    for target in ${CABAL_TARGETS}; do cabal new-build ${target}; done
