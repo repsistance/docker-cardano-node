@@ -5,9 +5,9 @@ on:
     - 'Dockerfile*'
     - 'baids/**'
     - '.github/**'
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron:  '0 */8 * * *'
+  #schedule:
+  #  # * is a special character in YAML so you have to quote this string
+  #  - cron:  '0 */8 * * *'
   watch:
     types: [started]
 
@@ -43,4 +43,6 @@ jobs:
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
+        # FIXME: get dynamic builds from iohk's hydra
+        export CARDNAO_NODE_COMMIT=88ed4d1
         cardano-node-docker-build
