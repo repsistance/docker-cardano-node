@@ -32,7 +32,9 @@ RUN mkdir -p /nonexistent /data && \
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install ${APT_ARGS} ${BASE_PACKAGES} ${BUILD_PACKAGES} && \
     pip3 install yq && \
-    git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME}
+    git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME} && \
+    ln -s ${GUILD_OPS_HOME}/scripts/cnode-helper-scripts/cntools.sh /usr/local/bin/cntools && \
+    chmpod +x /usr/local/bin/cntools
 
 COPY --from=bin-build /output/cardano* /usr/local/bin/
 USER nobody
