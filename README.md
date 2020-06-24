@@ -17,7 +17,7 @@ sleep 30
 docker-compose -f docker-compose.yml-standalone-tn up -d passive.local
 ```
 
-* Check
+* Check tip
 ```
 docker-compose -f docker-compose.yml-standalone-tn exec leader.local cardano-cli get-tip --testnet-magic 42
 docker-compose -f docker-compose.yml-standalone-tn exec passive.local cardano-cli get-tip --testnet-magic 42
