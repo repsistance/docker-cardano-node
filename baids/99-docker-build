@@ -37,6 +37,10 @@ function cardano-node-docker-build() {
         --label cardano-node-commit=${CARDANO_NODE_COMMIT} \
         -t ${BUILD_IMAGE} \
         .
+      if [ "${DOCKER_PUSH_IMAGES}" == "true" ]
+      then
+        docker push ${BUILD_IMAGE}
+      fi
     fi
   done
 
@@ -49,25 +53,14 @@ function cardano-node-docker-build() {
       --build-arg CARDANO_NODE_COMMIT=${CARDANO_NODE_COMMIT} \
       --target ${target} \
       -t ${BUILD_IMAGE} .
-  done
-
-}
-
-function cardano-node-docker-push() {
-
-  for target in ${DOCKER_SRC_TARGETS}
-  do
-    BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${CARDANO_NODE_COMMIT}
-    docker push ${BUILD_IMAGE}
-  done
-
-  for target in ${DOCKER_FINAL_TARGETS}
-  do
-    DETAILED_TAG=$(docker inspect -f '{{ .Created }}' ${DOCKER_IMAGE_NAME}:${target}|awk -F':' '{print $1$2}'|sed 's%-\|T%%g')-${CI_COMMIT_SHORT_SHA}-${CARDANO_NODE_COMMIT}
-    DETAILED_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${DETAILED_TAG}
-    docker tag ${DOCKER_IMAGE_NAME}:${target} ${DETAILED_IMAGE}
-    docker push ${DOCKER_IMAGE_NAME}:${target}
-    docker push ${DETAILED_IMAGE}
+      if [ "${DOCKER_PUSH_IMAGES}" == "true" ]
+      then
+        DETAILED_TAG=$(docker inspect -f '{{ .Created }}' ${BUILD_IMAGE}|awk -F':' '{print $1$2}'|sed 's%-\|T%%g')-${CI_COMMIT_SHORT_SHA}-${CARDANO_NODE_COMMIT}
+        DETAILED_IMAGE=${BUILD_IMAGE}-${DETAILED_TAG}
+        docker tag ${BUILD_IMAGE} ${DETAILED_IMAGE}
+        docker push ${BUILD_IMAGE}
+        docker push ${DETAILED_IMAGE}
+      fi
   done
 
 }
