@@ -27,7 +27,7 @@ function cardano-node-docker-build() {
   do
     BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${CARDANO_NODE_COMMIT}
     IMAGE_PRESENT=$(docker pull ${BUILD_IMAGE} &> /dev/null || echo false)
-    if [ "$IMAGE_PRESENT" == "false" ]
+    if [[ "${IMAGE_PRESENT}" == "false" ]] || [[ -z "${IMAGE_PRESENT}" ]]
     then
       docker build \
         -f Dockerfile.${target} \
