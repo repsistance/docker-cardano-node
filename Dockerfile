@@ -2,11 +2,11 @@ ARG CARDANO_NODE_COMMIT=master
 
 # misc
 ## Dockerfile.src
-FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
+#FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 ## Dockerfile.src-build
 #FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
 ## Dockerfile.bin-build
-FROM repsistance/cardano-node:bin-build AS bin-build
+FROM repsistance/cardano-node:bin-build-${CARDANO_NODE_COMMIT} AS bin-build
 ## nixos assets
 #FROM nixos/nix AS github-nix-assets
 #RUN nix-env -iA nixpkgs.curl
@@ -73,6 +73,6 @@ ENV CNODE_ROLE=leader
 
 ## distroless poc
 FROM gcr.io/distroless/base AS barebone-node
-COPY --from=src-build /output/cardano* /usr/local/bin/
+COPY --from=bin-build /output/cardano* /usr/local/bin/
 CMD ["/usr/local/bin/cardano-node"]
 

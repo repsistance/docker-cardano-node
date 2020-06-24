@@ -6,7 +6,7 @@ function cardano-node-docker-init() {
   test -z "${DOCKER_REPOSITORY+x}" && DOCKER_REPOSITORY=registry.local:5000
   test -z "${DOCKER_IMAGE_NAME+x}" && DOCKER_IMAGE_NAME=rcmorano/cardano-node
   test -z "${DOCKER_IMAGE_URI+x}" && DOCKER_IMAGE_URI=${DOCKER_REPOSITORY}/${DOCKER_IMAGE_NAME}
-  test -z "${DOCKER_SRC_TARGETS+x}" && DOCKER_SRC_TARGETS="src src-build"
+  test -z "${DOCKER_SRC_TARGETS+x}" && DOCKER_SRC_TARGETS="bin-build"
   test -z "${DOCKER_FINAL_TARGETS+x}" && DOCKER_FINAL_TARGETS="guild-ops-ptn0-passive iohk-stn-passive"
 
 }
