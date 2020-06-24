@@ -16,10 +16,10 @@ FROM repsistance/cardano-node:bin-build-${CARDANO_NODE_COMMIT} AS bin-build
 # production base
 FROM ubuntu:20.04 AS base
 ENV APT_ARGS="-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
-ARG BASE_PACKAGES="bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent"
+ARG BASE_PACKAGES="git bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent"
 ENV BASE_PACKAGES ${BASE_PACKAGES}
-ARG BUILD_PACKAGES="git"
-ENV BUILD_PACKAGES ${BUILD_PACKAGES}
+#ARG BUILD_PACKAGES="git"
+#ENV BUILD_PACKAGES ${BUILD_PACKAGES}
 VOLUME ["/opt/cardano/cnode/logs", "/opt/cardano/cnode/db", "/opt/cardano/cnode/priv"]
 ENV CNODE_HOME /opt/cardano/cnode
 ENV CARDANO_NODE_SOCKET_PATH /opt/cardano/cnode/sockets/node0.socket
@@ -41,8 +41,6 @@ FROM base AS standalone-tn-base
 ENV NETWORK=standalone-tn
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
 #COPY --from=github-nix-assets /var/tmp/ff-peers.json /opt/cardano/cnode/files/ff-peers.json
-USER root
-RUN apt-get remove -y ${BUILD_PACKAGES} && apt-get autoremove -y && apt-get clean -y
 CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
 FROM standalone-tn-base AS standalone-tn-passive
 ENV CNODE_ROLE=passive
@@ -53,7 +51,6 @@ FROM base AS guild-ops-ptn0-base
 ENV NETWORK=guild-ops-ptn0
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
 USER root
-RUN apt-get remove -y ${BUILD_PACKAGES} && apt-get autoremove -y && apt-get clean -y
 CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
 FROM guild-ops-ptn0-base AS guild-ops-ptn0-passive
 ENV CNODE_ROLE=passive
@@ -64,7 +61,6 @@ FROM base AS iohk-stn-base
 ENV NETWORK=iohk-stn
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
 USER root
-RUN apt-get remove -y ${BUILD_PACKAGES} && apt-get autoremove -y && apt-get clean -y
 CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
 FROM iohk-stn-base AS iohk-stn-passive
 ENV CNODE_ROLE=passive
