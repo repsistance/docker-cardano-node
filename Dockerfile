@@ -4,7 +4,7 @@ ARG CARDANO_NODE_COMMIT=master
 ## Dockerfile.src
 FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 ## Dockerfile.src-build
-FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
+#FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
 ## Dockerfile.bin-build
 FROM repsistance/cardano-node:bin-build AS bin-build
 ## nixos assets
