@@ -12,7 +12,8 @@ RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg build-essential pkg-config ghc cabal-install git libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev libsodium-dev pkg-config
 
 COPY --from=src /src /src
-RUN cabal update && \
+RUN echo -e "package cardano-crypto-praos\n  flags: -external-libsodium-vrf" > cabal.project.local && \
+    cabal update && \
     for target in ${CABAL_TARGETS}; do cabal new-build ${target}; done
 
 # TODO: there is probably a better way to extract/install binaries
