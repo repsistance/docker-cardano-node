@@ -14,7 +14,7 @@ FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
 # production base
 FROM ubuntu:20.04 AS base
 ENV APT_ARGS="-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
-ARG BASE_PACKAGES="bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent libsodium-dev pkg-config"
+ARG BASE_PACKAGES="bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent"
 ENV BASE_PACKAGES ${BASE_PACKAGES}
 ARG BUILD_PACKAGES="git"
 ENV BUILD_PACKAGES ${BUILD_PACKAGES}

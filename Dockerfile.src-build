@@ -9,7 +9,7 @@ ARG CABAL_TARGETS="cardano-node cardano-cli"
 WORKDIR /src
 
 RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg build-essential pkg-config ghc cabal-install git libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev
+    DEBIAN_FRONTEND=noninteractive apt-get install -y curl gnupg build-essential pkg-config ghc cabal-install git libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev libsodium-dev pkg-config
 
 COPY --from=src /src /src
 RUN cabal update && \
