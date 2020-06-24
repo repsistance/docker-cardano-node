@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function iohk-fftn-init() {
+function iohk-stn-init() {
 
   # misc env vars
   test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=byron-staging
@@ -32,16 +32,16 @@ function iohk-fftn-init() {
 
 }
 
-function iohk-fftn-fetch-github-peers() {
+function iohk-stn-fetch-github-peers() {
 
   curl -s https://raw.githubusercontent.com/input-output-hk/cardano-ops/master/topologies/ff-peers.nix | nix-instantiate --eval --json --strict - | jq .
 
 }
 
 
-function iohk-fftn-setup() {
+function iohk-stn-setup() {
 
-  iohk-fftn-init
+  iohk-stn-init
 
   for dir in files db logs sockets priv
   do
@@ -56,16 +56,16 @@ function iohk-fftn-setup() {
   #curl https://raw.githubusercontent.com/input-output-hk/cardano-node/${CNODE_BRANCH}/configuration/defaults/${IOHK_NETNAME}/topology.json | jq '.' > ${CNODE_TOPOLOGY_FILE}
 
   test -e ${CNODE_CONFIG_FILE} || \
-    iohk-fftn-setup-config
+    iohk-stn-setup-config
 
   test -e ${CNODE_TOPOLOGY_FILE} || \
-    iohk-fftn-setup-topology
+    iohk-stn-setup-topology
 
 }
 
-function iohk-fftn-setup-config() {
+function iohk-stn-setup-config() {
 
-  iohk-fftn-init
+  iohk-stn-init
 
   cp -a /assets/configuration.yaml ${CNODE_CONFIG_FILE}
   # workaround to make guild-ops' cntools work
@@ -73,13 +73,13 @@ function iohk-fftn-setup-config() {
 
 }
 
-function iohk-fftn-setup-topology() {
+function iohk-stn-setup-topology() {
 
   cat > ${CNODE_TOPOLOGY_FILE} <<EOF
 {
   "Producers": [
     {
-      "addr": "relays-new.ff.dev.cardano.org",
+      "addr": "relays-new.shelley-testnet.dev.cardano.org",
       "port": 3001,
       "valency": 1
     }
@@ -91,9 +91,9 @@ EOF
 
 }
 
-function iohk-fftn-cnode-run-as-passive() {
+function iohk-stn-cnode-run-as-passive() {
 
-  iohk-fftn-init
+  iohk-stn-init
 
   test -e ${SIGNING_KEY} || cardano-cli keygen --real-pbft --secret ${SIGNING_KEY} --no-password
   test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
@@ -107,9 +107,9 @@ function iohk-fftn-cnode-run-as-passive() {
 
 }
 
-function iohk-fftn-cnode-run-as-leader() {
+function iohk-stn-cnode-run-as-leader() {
 
-  iohk-fftn-init
+  iohk-stn-init
 
   cardano-node run \
     --config ${CNODE_CONFIG_FILE} \
@@ -124,9 +124,9 @@ function iohk-fftn-cnode-run-as-leader() {
 
 }
 
-function iohk-fftn-expose-socket-via-tcp-port() {
+function iohk-stn-expose-socket-via-tcp-port() {
 
-  iohk-fftn-init
+  iohk-stn-init
   socat -d -d -d -lf ns-socat.log TCP-LISTEN:10000,reuseaddr,fork UNIX-CLIENT:${CARDANO_NODE_SOCKET_PATH} &
 
 }
