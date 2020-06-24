@@ -39,8 +39,6 @@ function standalone-tn-setup() {
     mkdir -p ${CNODE_HOME}/${dir}
   done
   
-  git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME}
-
   ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
 
   test -e ${CNODE_CONFIG_FILE} || \
