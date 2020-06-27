@@ -18,5 +18,5 @@ RUN git clone ${CARDANO_NODE_GIT_REPO} /src && \
     mkdir /output && \
     for target in ${NIX_TARGETS}; \
     do \
-      nix-build -o /output/${target} -A haskellPackages.cardano-node.components.exes.${target};
+      nix-build -o /output/${target} -A haskellPackages.cardano-node.components.exes.${target}; \
     done
