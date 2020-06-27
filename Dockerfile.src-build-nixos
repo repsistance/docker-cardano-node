@@ -13,6 +13,7 @@ ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
 ARG NIX_TARGETS="cardano-cli cardano-node"
 ENV NIX_TARGETS ${NIX_TARGETS}
 
+COPY ./assets/etc/nix/nix.conf /etc/nix/nix.conf
 RUN git clone ${CARDANO_NODE_GIT_REPO} /src && \
     git checkout ${CARDANO_NODE_COMMIT} && \
     mkdir /output && \
