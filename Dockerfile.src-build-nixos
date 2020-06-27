@@ -1,0 +1,22 @@
+FROM nixos/nix AS nixos-base
+# Install depends
+RUN nix-env -iA nixpkgs.git nixpkgs.curl
+
+# Build args/Default Environment
+WORKDIR /src
+ARG BUILD_TIMESTAMP=202006271700
+ENV BUILD_TIMESTAMP ${BUILD_TIMESTAMP}
+ARG CARDANO_NODE_GIT_REPO=https://github.com/input-output-hk/cardano-node.git
+ENV CARDANO_NODE_GIT_REPO ${CARDANO_NODE_GIT_REPO}
+ARG CARDANO_NODE_COMMIT=1.14.1
+ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
+ARG NIX_TARGETS=cardano-cli cardano-node
+ENV NIX_TARGETS ${NIX_TARGETS}
+
+RUN git clone ${CARDANO_NODE_GIT_REPO} /src && \
+    git checkout ${CARDANO_NODE_COMMIT} && \
+    mkdir /output && \
+    for target in ${NIX_TARGETS}; \
+    do \
+      nix-build -o /output/${target} -A haskellPackages.cardano-node.components.exes.${target};
+    done
