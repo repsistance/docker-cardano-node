@@ -37,6 +37,7 @@ jobs:
         ln -s $PWD/baids ~/.baids/functions.d/docker-cardano-node
         source ~/.baids/baids
         set -x
+        # FIXME: remove fixed commit
         export CARDANO_NODE_COMMIT="1.14.1"
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
         cardano-node-docker-build
