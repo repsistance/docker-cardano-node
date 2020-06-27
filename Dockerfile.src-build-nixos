@@ -10,7 +10,7 @@ ARG CARDANO_NODE_GIT_REPO=https://github.com/input-output-hk/cardano-node.git
 ENV CARDANO_NODE_GIT_REPO ${CARDANO_NODE_GIT_REPO}
 ARG CARDANO_NODE_COMMIT=1.14.1
 ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
-ARG NIX_TARGETS=cardano-cli cardano-node
+ARG NIX_TARGETS="cardano-cli cardano-node"
 ENV NIX_TARGETS ${NIX_TARGETS}
 
 RUN git clone ${CARDANO_NODE_GIT_REPO} /src && \
