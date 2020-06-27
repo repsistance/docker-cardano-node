@@ -14,8 +14,9 @@ ARG NIX_TARGETS="cardano-cli cardano-node"
 ENV NIX_TARGETS ${NIX_TARGETS}
 
 COPY ./assets/etc/nix/nix.conf /etc/nix/nix.conf
-RUN git clone ${CARDANO_NODE_GIT_REPO} /src && \
-    git checkout ${CARDANO_NODE_COMMIT} && \
+RUN git clone ${CARDANO_NODE_GIT_REPO} /src
+COPY ./assets/cabal.project.local /src/cabal.project.local
+RUN git checkout ${CARDANO_NODE_COMMIT} && \
     mkdir /output && \
     for target in ${NIX_TARGETS}; \
     do \
