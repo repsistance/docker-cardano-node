@@ -5,6 +5,7 @@ function cardano-node-docker-init() {
   test -z "${CARDANO_NODE_COMMIT+x}" && CARDANO_NODE_COMMIT=master
   test -z "${DOCKER_REPOSITORY+x}" && DOCKER_REPOSITORY=registry.local:5000
   test -z "${DOCKER_IMAGE_NAME+x}" && DOCKER_IMAGE_NAME=rcmorano/cardano-node
+  test -z "${DOCKER_IMAGE_SUFFIX+x}" && DOCKER_IMAGE_NAME=""
   test -z "${DOCKER_IMAGE_URI+x}" && DOCKER_IMAGE_URI=${DOCKER_REPOSITORY}/${DOCKER_IMAGE_NAME}
   test -z "${DOCKER_SRC_TARGETS+x}" && DOCKER_SRC_TARGETS="bin-build"
   test -z "${DOCKER_FINAL_TARGETS+x}" && DOCKER_FINAL_TARGETS="guild-ops-ptn0-passive iohk-stn-passive"
@@ -46,7 +47,7 @@ function cardano-node-docker-build() {
 
   for target in ${DOCKER_FINAL_TARGETS}
   do
-    BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}
+    BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}${DOCKER_IMAGE_SUFFIX}
     docker pull ${BUILD_IMAGE} || true
     docker build \
       --cache-from ${BUILD_IMAGE} \
