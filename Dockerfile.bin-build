@@ -1,7 +1,7 @@
 FROM alpine AS src
 RUN apk add --no-cache curl
 # FROM https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished
-ARG CARDANO_NODE_LINUX_TGZ=https://hydra.iohk.io/build/3185375/download/1/cardano-node-1.14.0-linux.tar.gz
+ARG CARDANO_NODE_LINUX_TGZ=https://hydra.iohk.io/build/3229750/download/1/cardano-node-1.14.0-linux.tar.gz
 
 RUN mkdir /output && \
     curl -sLo /tmp/cardano-node.tgz ${CARDANO_NODE_LINUX_TGZ} && \
