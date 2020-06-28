@@ -5,8 +5,10 @@ ARG CARDANO_NODE_COMMIT=master
 #FROM repsistance/cardano-node:src-${CARDANO_NODE_COMMIT} AS src
 ## Dockerfile.src-build
 #FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build
+## Dockerfile.src-build-nixos
+FROM repsistance/cardano-node:src-build-${CARDANO_NODE_COMMIT} AS src-build-nixos
 ## Dockerfile.bin-build
-FROM repsistance/cardano-node:bin-build-${CARDANO_NODE_COMMIT} AS bin-build
+#FROM repsistance/cardano-node:bin-build-${CARDANO_NODE_COMMIT} AS bin-build
 ## nixos assets
 #FROM nixos/nix AS github-nix-assets
 #RUN nix-env -iA nixpkgs.curl
@@ -36,7 +38,7 @@ RUN apt-get update -qq && \
     ln -s ${GUILD_OPS_HOME}/scripts/cnode-helper-scripts/cntools.sh /usr/local/bin/cntools && \
     chmpod +x /usr/local/bin/cntools
 
-COPY --from=bin-build /output/cardano* /usr/local/bin/
+COPY --from=src-build-nixos /output/*/bin/cardano* /usr/local/bin/
 USER nobody
 RUN curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
 COPY baids/* /nonexistent/.baids/functions.d/
@@ -75,6 +77,6 @@ ENV CNODE_ROLE=leader
 
 ## distroless poc
 FROM gcr.io/distroless/base AS barebone-node
-COPY --from=bin-build /output/cardano* /usr/local/bin/
+COPY --from=src-build-nixos /output/*/bin/cardano* /usr/local/bin/
 CMD ["/usr/local/bin/cardano-node"]
 
