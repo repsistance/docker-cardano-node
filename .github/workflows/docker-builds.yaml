@@ -41,5 +41,5 @@ jobs:
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
         # FIXME: get dynamic builds from iohk's hydra
-        export CARDNAO_NODE_COMMIT=9cfe6fc
+        export CARDNAO_NODE_COMMIT=a1c0000
         cardano-node-docker-build
