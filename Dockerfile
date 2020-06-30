@@ -16,7 +16,7 @@ FROM repsistance/cardano-node:bin-build-${CARDANO_NODE_COMMIT} AS bin-build
 # production base
 FROM ubuntu:20.04 AS base
 ENV APT_ARGS="-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
-ARG BASE_PACKAGES="git bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent"
+ARG BASE_PACKAGES="git bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent libsodium23 libsodium-dev"
 ENV BASE_PACKAGES ${BASE_PACKAGES}
 ENV GUILD_OPS_BRANCH master
 ENV GUILD_OPS_GIT_REPO https://github.com/cardano-community/guild-operators.git
