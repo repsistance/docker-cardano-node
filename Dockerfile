@@ -33,8 +33,7 @@ RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install ${APT_ARGS} ${BASE_PACKAGES} ${BUILD_PACKAGES} && \
     pip3 install yq && \
     git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME} && \
-    ln -s ${GUILD_OPS_HOME}/scripts/cnode-helper-scripts ${CNODE_HOME}/scripts && \
-    chmod +x /usr/local/bin/cntools
+    ln -s ${GUILD_OPS_HOME}/scripts/cnode-helper-scripts ${CNODE_HOME}/scripts
 
 COPY --from=bin-build /output/cardano* /usr/local/bin/
 USER nobody
