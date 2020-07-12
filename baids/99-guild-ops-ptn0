@@ -40,7 +40,7 @@ function guild-ops-ptn0-setup() {
     mkdir -p ${CNODE_HOME}/${dir}
   done
 
-  ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
+
 
   cat ${GUILD_OPS_HOME}/files/ptn0/files/genesis.json | jq '.' > ${CNODE_GENESIS_FILE}
 

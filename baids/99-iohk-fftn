@@ -48,7 +48,7 @@ function iohk-fftn-setup() {
     mkdir -p ${CNODE_HOME}/${dir}
   done
   
-  ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
+
 
   curl https://raw.githubusercontent.com/input-output-hk/iohk-nix/${CNODE_BRANCH}/cardano-lib/ff-genesis.json | jq '.' > ${CNODE_GENESIS_FILE}
   #curl https://raw.githubusercontent.com/input-output-hk/cardano-node/${CNODE_BRANCH}/configuration/defaults/${IOHK_NETNAME}/topology.json | jq '.' > ${CNODE_TOPOLOGY_FILE}

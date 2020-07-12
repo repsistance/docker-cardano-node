@@ -39,7 +39,7 @@ function standalone-tn-setup() {
     mkdir -p ${CNODE_HOME}/${dir}
   done
   
-  ln -nfs ${GUILD_OPS_HOME}/scripts ${CNODE_HOME}/scripts
+
 
   test -e ${CNODE_CONFIG_FILE} || \
     standalone-tn-setup-config
