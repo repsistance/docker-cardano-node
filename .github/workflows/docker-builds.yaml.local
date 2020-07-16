@@ -2,12 +2,12 @@ name: docker builds
 on:
   push:
     paths:
-    - 'Dockerfile*'
+    - 'Dockerfile.*'
     - 'baids/**'
     - '.github/**'
-  #schedule:
-  #  # * is a special character in YAML so you have to quote this string
-  #  - cron:  '0 */8 * * *'
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 */8 * * *'
   watch:
     types: [started]
 
@@ -28,11 +28,13 @@ jobs:
         CARDANO_NODE_BUILD_BRANCH: master
         DOCKER_REGISTRY: docker.io
         DOCKER_IMAGE_NAME: repsistance/cardano-node
-        DOCKER_IMAGE_SUFFIX: "-1.15.1-arm64v8"
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
-        DOCKER_SRC_TARGETS: "arm"
-        DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive guild-ops-ptn0-leader iohk-stn-passive iohk-stn-leader standalone-tn-passive standalone-tn-leader"
-        DOCKER_PUSH_IMAGES: true
+        DOCKER_SRC_TARGETS: "src src-build"
+        #DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive iohk-fftn-passive standalone-tn-passive standalone-tn-leader"
+        DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive guild-ops-ptn0-leader"
+        #APT_PACKAGES: "git"
+        #APT_ARGS: "-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
+        #apt update -qq && apt install ${APT_ARGS} ${APT_PACKAGES}
       run: |
         curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
         ln -s $PWD/baids ~/.baids/functions.d/docker-cardano-node
@@ -40,5 +42,7 @@ jobs:
         set -x
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
         export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
+        export CARDANO_NODE_COMMIT=1c79736
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
         cardano-node-docker-build
+        #cardano-node-docker-push
