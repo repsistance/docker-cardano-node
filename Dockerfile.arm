@@ -4,13 +4,14 @@ ARG CARDANO_NODE_COMMIT=master
 ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
 
 RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y curl build-essential pkg-config libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev git jq libncursesw5 ghc cabal-install libsodium23 libsodium-dev
+    DEBIAN_FRONTEND=noninteractive apt-get install -y curl build-essential pkg-config libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev git jq libncursesw5 ghc cabal-install libsodium23 libsodium-dev && \
+    mkdir -p /assets/cardano-node-patches
 
 WORKDIR /opt/cardano-node
-COPY /assets/cardano-node-patches/cabal.project.local /assets/cardano-node-patches/cabal.project.local
+COPY /assets/cardano-node-patches/cabal.project.local /opt/cardano-node/patches
 RUN git clone https://github.com/input-output-hk/cardano-node /opt/cardano-node && \
     git checkout ${CARDANO_NODE_COMMIT} && \
-    cp -a /assets/cardano-node-patches/cabal.project.local . && \
+    cp -a patches/cabal.project.local . && \
     cabal update && \
     for target in cardano-node cardano-cli; do cabal new-build ${target}; done
 
