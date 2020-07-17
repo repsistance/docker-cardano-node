@@ -3,14 +3,8 @@ FROM arm64v8/ubuntu:18.04
 ARG CARDANO_NODE_COMMIT=master
 ENV CARDANO_NODE_COMMIT ${CARDANO_NODE_COMMIT}
 
-# TODO: probably clean up some depends
-# list was borrowed from https://github.com/cardano-community/guild-operators/blob/master/files/ptn0/scripts/prereqs.sh
-RUN apt-get update -qq && apt-get install -y curl gnupg && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list && \
-    apt-get update -qq
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3 build-essential pkg-config libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev git jq libncursesw5 ghc cabal-install libsodium23 libsodium-dev
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y curl build-essential pkg-config libffi-dev libgmp-dev libssl-dev libtinfo-dev libsystemd-dev zlib1g-dev git jq libncursesw5 ghc cabal-install libsodium23 libsodium-dev
 
 WORKDIR /opt/cardano-node
 COPY /assets/cardano-node-patches/cabal.project.local /assets/cardano-node-patches/cabal.project.local
