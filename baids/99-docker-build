@@ -34,6 +34,7 @@ function cardano-node-docker-build() {
       docker build \
         -f Dockerfile.${target} \
         --build-arg CARDANO_NODE_COMMIT=${CARDANO_NODE_COMMIT} \
+        --build-arg CARDANO_NODE_LINUX_TGZ=${CARDANO_NODE_LINUX_TGZ} \
         --cache-from ${BUILD_IMAGE} \
         --label docker-source-commit=${CI_COMMIT_SHORT_SHA} \
         --label cardano-node-commit=${CARDANO_NODE_COMMIT} \
