@@ -26,9 +26,11 @@ jobs:
     - name: build-n-push
       env:
         CARDANO_NODE_BUILD_BRANCH: master
+        CARDANO_NODE_COMMIT: ecc92b0 # overrides branch for tagging
+        CARDANO_NODE_LINUX_TGZ: https://hydra.iohk.io/build/3575028/download/1/cardano-node-1.16.0-linux.tar.gz
         DOCKER_REGISTRY: docker.io
         DOCKER_IMAGE_NAME: repsistance/cardano-node
-        DOCKER_IMAGE_SUFFIX: "-1.16.0-00830e2"
+        DOCKER_IMAGE_SUFFIX: "-1.16.0-ecc92b0"
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_SRC_TARGETS: "bin-build"
         DOCKER_FINAL_TARGETS: "guild-ops-ptn0-passive guild-ops-ptn0-leader iohk-stn-passive iohk-stn-leader standalone-tn-passive standalone-tn-leader"
@@ -39,8 +41,7 @@ jobs:
         source ~/.baids/baids
         set -x
         export CARDANO_NODE_LONG_COMMIT=$(cardano-node-get-git-branch-head $CARDANO_NODE_BUILD_BRANCH)
-        export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
+        test -z ${CARDANO_NODE_COMMIT+x} && export CARDANO_NODE_COMMIT=${CARDANO_NODE_LONG_COMMIT:0:7}
         export CI_COMMIT_SHORT_SHA=${GITHUB_SHA:0:7}
         # FIXME: get dynamic builds from iohk's hydra
-        export CARDANO_NODE_COMMIT=00830e2
         cardano-node-docker-build
