@@ -29,13 +29,12 @@ function cardano-node-docker-build() {
   do
     BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}-${CARDANO_NODE_COMMIT}
     IMAGE_PRESENT=$(docker pull ${BUILD_IMAGE} &> /dev/null || echo false)
-    if [[ "${IMAGE_PRESENT}" == "false" ]] || [[ -z "${IMAGE_PRESENT}" ]]
+    if [[ "${IMAGE_PRESENT}" == "false" ]]
     then
       docker build \
         -f Dockerfile.${target} \
         --build-arg CARDANO_NODE_COMMIT=${CARDANO_NODE_COMMIT} \
         --build-arg CARDANO_NODE_LINUX_TGZ=${CARDANO_NODE_LINUX_TGZ} \
-        --cache-from ${BUILD_IMAGE} \
         --label docker-source-commit=${CI_COMMIT_SHORT_SHA} \
         --label cardano-node-commit=${CARDANO_NODE_COMMIT} \
         -t ${BUILD_IMAGE} \
@@ -52,7 +51,6 @@ function cardano-node-docker-build() {
     BUILD_IMAGE=${DOCKER_IMAGE_NAME}:${target}${DOCKER_IMAGE_SUFFIX}
     docker pull ${BUILD_IMAGE} || true
     docker build \
-      --cache-from ${BUILD_IMAGE} \
       --build-arg CARDANO_NODE_COMMIT=${CARDANO_NODE_COMMIT} \
       --target ${target} \
       -t ${BUILD_IMAGE} .

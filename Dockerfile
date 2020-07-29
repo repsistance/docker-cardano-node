@@ -34,7 +34,7 @@ RUN apt-get update -qq && \
     pip3 install yq && \
     git clone --single-branch --branch ${GUILD_OPS_BRANCH} ${GUILD_OPS_GIT_REPO} ${GUILD_OPS_HOME} && \
     ln -s ${GUILD_OPS_HOME}/scripts/cnode-helper-scripts ${CNODE_HOME}/scripts && \
-    ln -s ${CNODE_HOME}/files/configuration.yaml ${CNODE_HOME}/ptn0.yaml
+    ln -s ${CNODE_HOME}/files/configuration.json ${CNODE_HOME}/ptn0.json
 
 COPY --from=bin-build /output/cardano* /usr/local/bin/
 USER nobody
@@ -46,7 +46,6 @@ USER nobody
 FROM base AS standalone-tn-base
 ENV NETWORK=standalone-tn
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
-#COPY --from=github-nix-assets /var/tmp/ff-peers.json /opt/cardano/cnode/files/ff-peers.json
 CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
 FROM standalone-tn-base AS standalone-tn-passive
 ENV CNODE_ROLE=passive
@@ -63,6 +62,7 @@ ENV CNODE_ROLE=passive
 FROM guild-ops-ptn0-base AS guild-ops-ptn0-leader
 ENV CNODE_ROLE=leader
 ## iohk images
+### stn
 FROM base AS iohk-stn-base
 ENV NETWORK=iohk-stn
 RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
@@ -71,6 +71,16 @@ CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c '
 FROM iohk-stn-base AS iohk-stn-passive
 ENV CNODE_ROLE=passive
 FROM iohk-stn-base AS iohk-stn-leader
+ENV CNODE_ROLE=leader
+### mainnet
+FROM base AS iohk-mn-base
+ENV NETWORK=iohk-mn
+RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
+USER root
+CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
+FROM iohk-mn-base AS iohk-mn-passive
+ENV CNODE_ROLE=passive
+FROM iohk-mn-base AS iohk-mn-leader
 ENV CNODE_ROLE=leader
 
 ## distroless poc
