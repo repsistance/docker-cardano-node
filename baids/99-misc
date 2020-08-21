@@ -31,3 +31,18 @@ function cardano-node-startup-probe() {
   fi
 
 }
+
+function cardano-node-expose-socket-via-tcp-port() {
+
+  iohk-mn-init
+  socat -d -d -d -lf ns-socat.log TCP-LISTEN:10000,reuseaddr,fork UNIX-CLIENT:${CARDANO_NODE_SOCKET_PATH} &
+
+}
+
+function cardano-node-expose-tcp-port-via-socket() {
+
+  iohk-mn-init
+  ADDRESS=$1
+  socat -d -d -d -lf ns-socat.log UNIX-LISTEN:${CARDANO_NODE_SOCKET_PATH} TCP:${ADDRESS},reuseaddr,fork
+
+}
