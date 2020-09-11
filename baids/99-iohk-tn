@@ -1,0 +1,120 @@
+#!/bin/bash
+
+function iohk-tn-init() {
+
+  # misc env vars
+  test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=byron-staging
+  test -z "${GUILD_OPS_BRANCH+x}"         && export GUILD_OPS_BRANCH=master
+  test -z "${GUILD_OPS_GIT_REPO+x}"       && export GUILD_OPS_GIT_REPO=https://github.com/cardano-community/guild-operators.git
+  test -z "${GUILD_OPS_HOME+x}"           && export GUILD_OPS_HOME=/opt/cardano/guild-operators
+  test -z "${SOCAT_LISTEN_PORT+x}"        && export SOCAT_LISTEN_PORT=13789
+  # cardano-node related vars
+  test -z "${CNODE_BRANCH+x}"             && export CNODE_BRANCH=master
+  test -z "${CNODE_HOME+x}"               && export CNODE_HOME=/opt/cardano/cnode
+  test -z "${CNODE_DB_PATH+x}"            && export CNODE_DB_PATH=/opt/cardano/cnode/db
+  test -z "${CNODE_CONFIG_FILE+x}"        && export CNODE_CONFIG_FILE=${CNODE_HOME}/files/configuration.json
+  test -z "${CNODE_GENESIS_DIR+x}"        && export CNODE_GENESIS_DIR=${CNODE_HOME}/files
+  test -z "${CNODE_GENESIS_FILE+x}"       && export CNODE_GENESIS_FILE=${CNODE_GENESIS_DIR}/genesis.json
+  test -z "${CNODE_BYRON_GENESIS_FILE+x}" && export CNODE_BYRON_GENESIS_FILE=${CNODE_GENESIS_DIR}/byron-genesis.json
+  test -z "${CNODE_TOPOLOGY_FILE+x}"      && export CNODE_TOPOLOGY_FILE=${CNODE_HOME}/files/topology.json
+  test -z "${CNODE_PORT+x}"               && export CNODE_PORT=54321
+  test -z "${CNODE_HOST_ADDR+x}"          && export CNODE_HOST_ADDR=$(curl -s ifconfig.me)
+  test -z "${CARDANO_NODE_SOCKET_PATH+x}" && export CARDANO_NODE_SOCKET_PATH=${CNODE_HOME}/sockets/node0.socket
+  # key related vars
+  test -z "${POOL_NAME+x}"                && export POOL_NAME=default
+  test -z "${VRF_VKEY+x}"                 && export VRF_VKEY=${CNODE_HOME}/priv/pool/${POOL_NAME}/vrf.vkey
+  test -z "${VRF_SKEY+x}"                 && export VRF_SKEY=${CNODE_HOME}/priv/pool/${POOL_NAME}/vrf.skey
+  test -z "${KES_VKEY+x}"                 && export KES_VKEY=${CNODE_HOME}/priv/pool/${POOL_NAME}/hot.vkey
+  test -z "${KES_SKEY+x}"                 && export KES_SKEY=${CNODE_HOME}/priv/pool/${POOL_NAME}/hot.skey
+  test -z "${CNODE_CERT+x}"               && export CNODE_CERT=${CNODE_HOME}/priv/pool/${POOL_NAME}/op.cert
+  # chain related vars
+  test -z "${NETWORK_MAGIC+x}"            && export NETWORK_MAGIC=$(jq -r .networkMagic ${CNODE_GENESIS_FILE} 2> /dev/null)
+  test -z "${LOVELACE_SUPPLY+x}"          && export LOVELACE_SUPPLY=1000000000
+
+}
+
+function iohk-tn-fetch-explorer-peers() {
+
+  curl -s https://explorer.mainnet.dev.cardano.org/relays/topology.json | jq -S .
+
+}
+
+
+function iohk-tn-setup() {
+
+  iohk-tn-init
+
+  for dir in files db logs sockets priv
+  do
+    mkdir -p ${CNODE_HOME}/${dir}
+  done
+
+  curl https://hydra.iohk.io/build/3670619/download/1/testnet-byron-genesis.json | jq -r '.' > ${CNODE_BYRON_GENESIS_FILE}
+  curl https://hydra.iohk.io/build/3670619/download/1/testnet-shelley-genesis.json | jq -r '.' > ${CNODE_GENESIS_FILE}
+
+  test -e ${CNODE_CONFIG_FILE} || \
+    iohk-tn-setup-config
+
+  test -e ${CNODE_TOPOLOGY_FILE} || \
+    CNODE_ROLE=passive iohk-tn-setup-topology
+
+}
+
+function iohk-tn-setup-config() {
+
+  iohk-tn-init
+
+  cp -a /assets/iohk-tn-configuration.json ${CNODE_CONFIG_FILE}
+  # workaround to make guild-ops' cntools work
+  ln -nfs ${CNODE_CONFIG_FILE} ${CNODE_HOME}/files/ptn0.json
+
+}
+
+function iohk-tn-setup-topology() {
+
+  curl https://hydra.iohk.io/build/3670619/download/1/testnet-topology.json | jq -r '.' > ${CNODE_TOPOLOGY_FILE}
+
+  ln -s ${CNODE_TOPOLOGY_FILE} ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
+
+}
+
+function iohk-tn-cnode-run-as-passive() {
+
+  iohk-tn-init
+
+  test -e ${SIGNING_KEY} || cardano-cli keygen --real-pbft --secret ${SIGNING_KEY} --no-password
+  test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
+
+  cardano-node run \
+    --config ${CNODE_CONFIG_FILE} \
+    --database-path ${CNODE_DB_PATH} \
+    --host-addr ${CNODE_HOST_ADDR} \
+    --port ${CNODE_PORT} \
+    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
+
+}
+
+function iohk-tn-cnode-run-as-leader() {
+
+  iohk-tn-init
+
+  cardano-node --version
+  cardano-node run \
+    --config ${CNODE_CONFIG_FILE} \
+    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \
+    --database-path ${CNODE_DB_PATH} \
+    --socket-path ${CARDANO_NODE_SOCKET_PATH} \
+    --host-addr ${CNODE_HOST_ADDR} \
+    --port ${CNODE_PORT} \
+    --shelley-kes-key ${KES_SKEY} \
+    --shelley-vrf-key ${VRF_SKEY} \
+    --shelley-operational-certificate ${CNODE_CERT}
+
+}
+
+function iohk-tn-expose-socket-via-tcp-port() {
+
+  iohk-tn-init
+  socat -d -d -d -lf ns-socat.log TCP-LISTEN:10000,reuseaddr,fork UNIX-CLIENT:${CARDANO_NODE_SOCKET_PATH} &
+
+}

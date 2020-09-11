@@ -82,6 +82,16 @@ FROM iohk-mn-base AS iohk-mn-passive
 ENV CNODE_ROLE=passive
 FROM iohk-mn-base AS iohk-mn-leader
 ENV CNODE_ROLE=leader
+### testnet
+FROM base AS iohk-tn-base
+ENV NETWORK=iohk-tn
+RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
+USER root
+CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
+FROM iohk-tn-base AS iohk-tn-passive
+ENV CNODE_ROLE=passive
+FROM iohk-tn-base AS iohk-tn-leader
+ENV CNODE_ROLE=leader
 
 ## distroless poc
 FROM gcr.io/distroless/base AS barebone-node
