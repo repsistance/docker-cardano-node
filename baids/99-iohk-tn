@@ -3,7 +3,7 @@
 function iohk-tn-init() {
 
   # misc env vars
-  test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=byron-staging
+  test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=testnet
   test -z "${GUILD_OPS_BRANCH+x}"         && export GUILD_OPS_BRANCH=master
   test -z "${GUILD_OPS_GIT_REPO+x}"       && export GUILD_OPS_GIT_REPO=https://github.com/cardano-community/guild-operators.git
   test -z "${GUILD_OPS_HOME+x}"           && export GUILD_OPS_HOME=/opt/cardano/guild-operators
@@ -35,7 +35,7 @@ function iohk-tn-init() {
 
 function iohk-tn-fetch-explorer-peers() {
 
-  curl -s https://explorer.mainnet.dev.cardano.org/relays/topology.json | jq -S .
+  curl -s https://explorer.cardano-testnet.iohkdev.io/relays/topology.json | jq -S .
 
 }
 
@@ -48,9 +48,8 @@ function iohk-tn-setup() {
   do
     mkdir -p ${CNODE_HOME}/${dir}
   done
-
-  curl https://hydra.iohk.io/build/3670619/download/1/testnet-byron-genesis.json | jq -r '.' > ${CNODE_BYRON_GENESIS_FILE}
-  curl https://hydra.iohk.io/build/3670619/download/1/testnet-shelley-genesis.json | jq -r '.' > ${CNODE_GENESIS_FILE}
+  curl https://hydra.iohk.io/build/4096235/download/1/testnet-byron-genesis.json | jq -r '.' > ${CNODE_BYRON_GENESIS_FILE}
+  curl https://hydra.iohk.io/build/4096235/download/1/testnet-shelley-genesis.json | jq -r '.' > ${CNODE_GENESIS_FILE}
 
   test -e ${CNODE_CONFIG_FILE} || \
     iohk-tn-setup-config
@@ -72,7 +71,7 @@ function iohk-tn-setup-config() {
 
 function iohk-tn-setup-topology() {
 
-  curl https://hydra.iohk.io/build/3670619/download/1/testnet-topology.json | jq -r '.' > ${CNODE_TOPOLOGY_FILE}
+  iohk-tn-fetch-explorer-peers > ${CNODE_TOPOLOGY_FILE}
 
   ln -s ${CNODE_TOPOLOGY_FILE} ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
 

@@ -3,7 +3,7 @@
 function iohk-mn-init() {
 
   # misc env vars
-  test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=byron-staging
+  test -z "${IOHK_NETNAME+x}"             && export IOHK_NETNAME=mainnet
   test -z "${GUILD_OPS_BRANCH+x}"         && export GUILD_OPS_BRANCH=master
   test -z "${GUILD_OPS_GIT_REPO+x}"       && export GUILD_OPS_GIT_REPO=https://github.com/cardano-community/guild-operators.git
   test -z "${GUILD_OPS_HOME+x}"           && export GUILD_OPS_HOME=/opt/cardano/guild-operators
