@@ -14,6 +14,7 @@
   "ShelleyGenesisHash": "47daa6201f436c90f9c76e343e0fd6536262b7ca2455ec306aa2fcc45c97bb4d",
   "TestAllegraHardForkAtEpoch": 2,
   "TestShelleyHardForkAtEpoch": 1,
+  "SocketPath": "/opt/cardano/cnode/sockets/node0.socket",
   "TraceBlockFetchClient": true,
   "TraceBlockFetchDecisions": true,
   "TraceBlockFetchProtocol": true,
@@ -73,7 +74,7 @@
         "EKGViewBK"
       ],
       "cardano.node.metrics": [
-        "EKGViewBK",
+        "EKGViewBK"
       ],
       "cardano.node.metrics.Forge": [
         "EKGViewBK"
