@@ -12,7 +12,7 @@ function iohk-mn-init() {
   test -z "${CNODE_BRANCH+x}"             && export CNODE_BRANCH=master
   test -z "${CNODE_HOME+x}"               && export CNODE_HOME=/opt/cardano/cnode
   test -z "${CNODE_DB_PATH+x}"            && export CNODE_DB_PATH=/opt/cardano/cnode/db
-  test -z "${CNODE_CONFIG_FILE+x}"        && export CNODE_CONFIG_FILE=${CNODE_HOME}/files/configuration.json
+  test -z "${CNODE_CONFIG_FILE+x}"        && export CNODE_CONFIG_FILE=${CNODE_HOME}/files/config.json
   test -z "${CNODE_GENESIS_DIR+x}"        && export CNODE_GENESIS_DIR=${CNODE_HOME}/files
   test -z "${CNODE_GENESIS_FILE+x}"       && export CNODE_GENESIS_FILE=${CNODE_GENESIS_DIR}/genesis.json
   test -z "${CNODE_BYRON_GENESIS_FILE+x}" && export CNODE_BYRON_GENESIS_FILE=${CNODE_GENESIS_DIR}/byron-genesis.json
@@ -49,8 +49,8 @@ function iohk-mn-setup() {
     mkdir -p ${CNODE_HOME}/${dir}
   done
 
-  curl https://hydra.iohk.io/build/3644329/download/1/mainnet-byron-genesis.json | jq '.' > ${CNODE_BYRON_GENESIS_FILE}
-  curl https://hydra.iohk.io/build/3644329/download/1/mainnet-shelley-genesis.json | jq '.' > ${CNODE_GENESIS_FILE}
+  curl https://hydra.iohk.io/build/3644329/download/1/mainnet-byron-genesis.json -o ${CNODE_BYRON_GENESIS_FILE}
+  curl https://hydra.iohk.io/build/3644329/download/1/mainnet-shelley-genesis.json -o ${CNODE_GENESIS_FILE}
 
   test -e ${CNODE_CONFIG_FILE} || \
     iohk-mn-setup-config
@@ -65,8 +65,6 @@ function iohk-mn-setup-config() {
   iohk-mn-init
 
   cp -a /assets/mainnet-configuration.json ${CNODE_CONFIG_FILE}
-  # workaround to make guild-ops' cntools work
-  ln -nfs ${CNODE_CONFIG_FILE} ${CNODE_HOME}/files/ptn0.json
 
 }
 
