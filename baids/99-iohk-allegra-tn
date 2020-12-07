@@ -63,7 +63,7 @@ function iohk-allegra-tn-setup-config() {
 
   iohk-allegra-tn-init
 
-  cp -a /assets/iohk-allegra-tn-configuration.json ${CNODE_CONFIG_FILE}
+  cp -a /assets/iohk-allegra-tn-config.json ${CNODE_CONFIG_FILE}
 
 }
 
