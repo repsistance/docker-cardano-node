@@ -92,6 +92,18 @@ FROM iohk-tn-base AS iohk-tn-passive
 ENV CNODE_ROLE=passive
 FROM iohk-tn-base AS iohk-tn-leader
 ENV CNODE_ROLE=leader
+### allegra-tn
+FROM base AS iohk-allegra-tn-base
+ENV NETWORK=iohk-allegra-tn
+RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
+USER root
+CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
+FROM iohk-allegra-tn-base AS iohk-allegra-tn-passive
+ENV CNODE_ROLE=passive
+FROM iohk-allegra-tn-base AS iohk-allegra-tn-leader
+ENV CNODE_ROLE=leader
+
+
 
 ## distroless poc
 FROM gcr.io/distroless/base AS barebone-node
