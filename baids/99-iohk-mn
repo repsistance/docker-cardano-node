@@ -93,12 +93,14 @@ function iohk-mn-cnode-run-as-passive() {
   test -e ${SIGNING_KEY} || cardano-cli keygen --real-pbft --secret ${SIGNING_KEY} --no-password
   test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
 
+  cardano-node --version
   cardano-node run \
     --config ${CNODE_CONFIG_FILE} \
+    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \
     --database-path ${CNODE_DB_PATH} \
+    --socket-path ${CARDANO_NODE_SOCKET_PATH} \
     --host-addr ${CNODE_HOST_ADDR} \
-    --port ${CNODE_PORT} \
-    --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
+    --port ${CNODE_PORT}
 
 }
 
