@@ -100,7 +100,8 @@ function iohk-mn-cnode-run-as-passive() {
     --database-path ${CNODE_DB_PATH} \
     --socket-path ${CARDANO_NODE_SOCKET_PATH} \
     --host-addr ${CNODE_HOST_ADDR} \
-    --port ${CNODE_PORT}
+    --port ${CNODE_PORT} \
+    $@
 
 }
 
@@ -118,7 +119,8 @@ function iohk-mn-cnode-run-as-leader() {
     --port ${CNODE_PORT} \
     --shelley-kes-key ${KES_SKEY} \
     --shelley-vrf-key ${VRF_SKEY} \
-    --shelley-operational-certificate ${CNODE_CERT}
+    --shelley-operational-certificate ${CNODE_CERT} \
+    $@
 
 }
 
