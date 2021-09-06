@@ -52,6 +52,7 @@ function iohk-mn-setup() {
 
   curl https://hydra.iohk.io/build/3644329/download/1/mainnet-byron-genesis.json -o ${CNODE_BYRON_GENESIS_FILE}
   curl https://hydra.iohk.io/build/3644329/download/1/mainnet-shelley-genesis.json -o ${CNODE_GENESIS_FILE}
+  curl https://hydra.iohk.io/build/7370192/download/1/mainnet-alonzo-genesis.json -o ${CNODE_ALONZO_GENESIS_FILE}
 
   test -e ${CNODE_CONFIG_FILE} || \
     iohk-mn-setup-config
