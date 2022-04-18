@@ -17,18 +17,23 @@ FROM repsistance/cardano-node:bin-build-${CARDANO_NODE_COMMIT} AS bin-build
 FROM ubuntu:20.04 AS base
 VOLUME ["/opt/cardano/cnode/logs", "/opt/cardano/cnode/db", "/opt/cardano/cnode/priv"]
 ENV APT_ARGS="-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
-ARG BASE_PACKAGES="git bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent libsodium23 libsodium-dev wget vim bsdmainutils socat tcptraceroute iproute2"
+ARG BASE_PACKAGES="git bash jq libatomic1 sudo curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent libsodium23 libsodium-dev wget vim bsdmainutils socat tcptraceroute iproute2 less"
 ENV BASE_PACKAGES ${BASE_PACKAGES}
 ENV GUILD_OPS_BRANCH master
 ENV GUILD_OPS_GIT_REPO https://github.com/cardano-community/guild-operators.git
 ENV GUILD_OPS_HOME /opt/cardano/guild-operators
 ENV CNODE_HOME /opt/cardano/cnode
 ENV CARDANO_NODE_SOCKET_PATH /opt/cardano/cnode/sockets/node0.socket
+ENV CARDANO_WALLET_TAG=v2021-11-11
+ADD ./baids/00-cardano-wallet-binaries-setup /tmp/00-cardano-wallet-binaries-setup
 
 RUN mkdir -p /nonexistent /data && \
     chown nobody: /nonexistent && \
     mkdir -p ${CNODE_HOME} && \
-    chown -R nobody: ${CNODE_HOME}/..
+    chown -R nobody: ${CNODE_HOME}/.. && \
+    bash -c 'source /tmp/00-cardano-wallet-binaries-setup && \
+      set -e; cardano-wallet-download-binaries linux64 ${CARDANO_WALLET_TAG}'
+
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install ${APT_ARGS} ${BASE_PACKAGES} ${BUILD_PACKAGES} && \
     pip3 install yq && \
