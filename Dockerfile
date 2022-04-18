@@ -39,7 +39,8 @@ RUN apt-get update -qq && \
     ln -s ${GUILD_OPS_HOME}/scripts/cnode-helper-scripts ${CNODE_HOME}/scripts && \
     ln -s ${CNODE_HOME}/files/configuration.json ${CNODE_HOME}/ptn0.json && \
     bash -c 'source /tmp/00-cardano-wallet-binaries-setup && \
-      set -e; cardano-wallet-download-binaries linux64 ${CARDANO_WALLET_TAG}'
+      set -e; cardano-wallet-download-binaries linux64 ${CARDANO_WALLET_TAG}' && \
+    curl -sLo /tmp/cardano-hw-cli.deb  https://github.com/vacuumlabs/cardano-hw-cli/releases/download/v1.9.1/cardano-hw-cli_1.9.1-1.deb && sudo dpkg -i /tmp/cardano-hw-cli.deb
 
 COPY --from=bin-build /output/cardano* /usr/local/bin/
 USER nobody
