@@ -26,11 +26,11 @@ jobs:
     - name: build-n-push
       env:
         CARDANO_NODE_BUILD_BRANCH: master
-        CARDANO_NODE_COMMIT: 73f9a74 # overrides branch for tagging
-        CARDANO_NODE_LINUX_TGZ: https://hydra.iohk.io/build/13065769/download/1/cardano-node-1.34.1-linux.tar.gz
+        CARDANO_NODE_COMMIT: 9f1d7dc # overrides branch for tagging
+        CARDANO_NODE_LINUX_TGZ: https://hydra.iohk.io/build/16159630/download/1/cardano-node-1.35.0-linux.tar.gz
         DOCKER_REGISTRY: docker.io
         DOCKER_IMAGE_NAME: repsistance/cardano-node
-        DOCKER_IMAGE_SUFFIX: "-1.34.1-1"
+        DOCKER_IMAGE_SUFFIX: "-1.35.0-0"
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_SRC_TARGETS: "bin-build"
         DOCKER_FINAL_TARGETS: "iohk-mn-passive iohk-mn-leader iohk-tn-passive iohk-tn-leader standalone-tn-passive standalone-tn-leader"
