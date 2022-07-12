@@ -58,27 +58,7 @@ FROM standalone-tn-base AS standalone-tn-passive
 ENV CNODE_ROLE=passive
 FROM standalone-tn-base AS standalone-tn-leader
 ENV CNODE_ROLE=leader
-## guild-ops images
-FROM base AS guild-ops-ptn0-base
-ENV NETWORK=guild-ops-ptn0
-RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
-USER root
-CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
-FROM guild-ops-ptn0-base AS guild-ops-ptn0-passive
-ENV CNODE_ROLE=passive
-FROM guild-ops-ptn0-base AS guild-ops-ptn0-leader
-ENV CNODE_ROLE=leader
 ## iohk images
-### stn
-FROM base AS iohk-stn-base
-ENV NETWORK=iohk-stn
-RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
-USER root
-CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
-FROM iohk-stn-base AS iohk-stn-passive
-ENV CNODE_ROLE=passive
-FROM iohk-stn-base AS iohk-stn-leader
-ENV CNODE_ROLE=leader
 ### mainnet
 FROM base AS iohk-mn-base
 ENV NETWORK=iohk-mn
@@ -99,18 +79,6 @@ FROM iohk-tn-base AS iohk-tn-passive
 ENV CNODE_ROLE=passive
 FROM iohk-tn-base AS iohk-tn-leader
 ENV CNODE_ROLE=leader
-### allegra-tn
-FROM base AS iohk-allegra-tn-base
-ENV NETWORK=iohk-allegra-tn
-RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
-USER root
-CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
-FROM iohk-allegra-tn-base AS iohk-allegra-tn-passive
-ENV CNODE_ROLE=passive
-FROM iohk-allegra-tn-base AS iohk-allegra-tn-leader
-ENV CNODE_ROLE=leader
-
-
 
 ## distroless poc
 FROM gcr.io/distroless/base AS barebone-node
