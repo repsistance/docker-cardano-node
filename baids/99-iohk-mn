@@ -96,7 +96,7 @@ function iohk-mn-cnode-run-as-passive() {
   test -e ${VRF_KEY} || cardano-cli to-verification --real-pbft --secret ${SIGNING_KEY} --to ${VRF_KEY}
 
   cardano-node --version
-  cardano-node run \
+  exec cardano-node run \
     --config ${CNODE_CONFIG_FILE} \
     --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \
     --database-path ${CNODE_DB_PATH} \
@@ -112,7 +112,7 @@ function iohk-mn-cnode-run-as-leader() {
   iohk-mn-init
 
   cardano-node --version
-  cardano-node run \
+  exec cardano-node run \
     --config ${CNODE_CONFIG_FILE} \
     --topology ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE} \
     --database-path ${CNODE_DB_PATH} \
