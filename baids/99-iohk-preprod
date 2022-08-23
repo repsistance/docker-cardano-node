@@ -34,13 +34,6 @@ function iohk-preprod-init() {
 
 }
 
-function iohk-preprod-fetch-explorer-peers() {
-
-  curl -s https://explorer.cardano-testnet.iohkdev.io/relays/topology.json | jq -S .
-
-}
-
-
 function iohk-preprod-setup() {
 
   iohk-preprod-init
@@ -66,14 +59,12 @@ function iohk-preprod-setup-config() {
   iohk-preprod-init
 
   cp -a /assets/iohk-preprod-configuration.json ${CNODE_CONFIG_FILE}
-  # workaround to make guild-ops' cntools work
-  ln -nfs ${CNODE_CONFIG_FILE} ${CNODE_HOME}/files/ptn0.json
 
 }
 
 function iohk-preprod-setup-topology() {
 
-  iohk-preprod-fetch-explorer-peers > ${CNODE_TOPOLOGY_FILE}
+  curl -s https://book.world.dev.cardano.org/environments/preprod/topology.json | jq -S . > ${CNODE_TOPOLOGY_FILE}
 
   ln -s ${CNODE_TOPOLOGY_FILE} ${CNODE_TOPOLOGY_FILE}.${CNODE_ROLE}
 
