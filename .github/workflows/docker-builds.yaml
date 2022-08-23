@@ -33,7 +33,7 @@ jobs:
         DOCKER_IMAGE_SUFFIX: "-1.35.3-1"
         DOCKER_IMAGE_URI: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}
         DOCKER_SRC_TARGETS: "bin-build"
-        DOCKER_FINAL_TARGETS: "iohk-mn-passive iohk-mn-leader iohk-tn-passive iohk-tn-leader standalone-tn-passive standalone-tn-leader"
+        DOCKER_FINAL_TARGETS: "iohk-mn-passive iohk-mn-leader iohk-tn-passive iohk-tn-leader iohk-preview-passive iohk-preview-leader iohk-preprod-passive iohk-preprod-leader standalone-tn-passive standalone-tn-leader"
         DOCKER_PUSH_IMAGES: true
       run: |
         curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
