@@ -18,7 +18,7 @@ FROM ubuntu:20.04 AS base
 STOPSIGNAL SIGINT
 VOLUME ["/opt/cardano/cnode/logs", "/opt/cardano/cnode/db", "/opt/cardano/cnode/priv"]
 ENV APT_ARGS="-y -o APT::Install-Suggests=false -o APT::Install-Recommends=false"
-ARG BASE_PACKAGES="git bash jq libatomic1 sudo wget curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent libsodium23 libsodium-dev wget vim bsdmainutils socat tcptraceroute iproute2 less"
+ARG BASE_PACKAGES="git bash jq libatomic1 sudo wget curl screen python3-pip netbase net-tools dnsutils bc systemd gpg gpg-agent libsodium23 libsodium-dev wget vim bsdmainutils socat tcptraceroute iproute2 less liblz4-tool"
 ENV BASE_PACKAGES ${BASE_PACKAGES}
 ENV GUILD_OPS_BRANCH master
 ENV GUILD_OPS_GIT_REPO https://github.com/cardano-community/guild-operators.git
