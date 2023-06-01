@@ -17,6 +17,7 @@ function iohk-preview-init() {
   test -z "${CNODE_GENESIS_FILE+x}"       && export CNODE_GENESIS_FILE=${CNODE_GENESIS_DIR}/genesis.json
   test -z "${CNODE_BYRON_GENESIS_FILE+x}" && export CNODE_BYRON_GENESIS_FILE=${CNODE_GENESIS_DIR}/byron-genesis.json
   test -z "${CNODE_ALONZO_GENESIS_FILE+x}" && export CNODE_ALONZO_GENESIS_FILE=${CNODE_GENESIS_DIR}/alonzo-genesis.json
+  test -z "${CNODE_CONWAY_GENESIS_FILE+x}" && export CNODE_CONWAY_GENESIS_FILE=${CNODE_GENESIS_DIR}/conway-genesis.json
   test -z "${CNODE_TOPOLOGY_FILE+x}"      && export CNODE_TOPOLOGY_FILE=${CNODE_HOME}/files/topology.json
   test -z "${CNODE_PORT+x}"               && export CNODE_PORT=54321
   test -z "${CNODE_HOST_ADDR+x}"          && export CNODE_HOST_ADDR=$(curl -s ifconfig.me)
@@ -45,6 +46,7 @@ function iohk-preview-setup() {
   curl https://book.world.dev.cardano.org/environments/preview/byron-genesis.json -o ${CNODE_BYRON_GENESIS_FILE}
   curl https://book.world.dev.cardano.org/environments/preview/shelley-genesis.json -o ${CNODE_GENESIS_FILE}
   curl https://book.world.dev.cardano.org/environments/preview/alonzo-genesis.json -o ${CNODE_ALONZO_GENESIS_FILE}
+  curl https://book.world.dev.cardano.org/environments/preview/conway-genesis.json -o ${CNODE_CONWAY_GENESIS_FILE}
 
   test -e ${CNODE_CONFIG_FILE} || \
     iohk-preview-setup-config
