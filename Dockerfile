@@ -100,6 +100,17 @@ ENV CNODE_ROLE=passive
 FROM iohk-preprod-base AS iohk-preprod-leader
 ENV CNODE_ROLE=leader
 
+### sanchonet
+FROM base AS iohk-sanchonet-base
+ENV NETWORK=iohk-sanchonet
+RUN bash -c 'source /nonexistent/.baids/baids && ${NETWORK}-setup'
+USER root
+CMD ["bash", "-c", "chown -R nobody: ${CNODE_HOME} && sudo -EHu nobody bash -c 'source ~/.baids/baids && ${NETWORK}-cnode-run-as-${CNODE_ROLE}'"]
+FROM iohk-sanchonet-base AS iohk-sanchonet-passive
+ENV CNODE_ROLE=passive
+FROM iohk-sanchonet-base AS iohk-sanchonet-leader
+ENV CNODE_ROLE=leader
+
 
 ## distroless poc
 FROM gcr.io/distroless/base AS barebone-node
