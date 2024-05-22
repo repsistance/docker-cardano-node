@@ -43,7 +43,7 @@ RUN apt-get update -qq && \
       set -e; cardano-wallet-download-binaries linux64 ${CARDANO_WALLET_TAG}' && \
     curl -sLo /tmp/cardano-hw-cli.deb https://github.com/vacuumlabs/cardano-hw-cli/releases/download/v1.10.0/cardano-hw-cli_1.10.0-1.deb && sudo dpkg -i /tmp/cardano-hw-cli.deb
 
-COPY --from=bin-build /output/cardano* /usr/local/bin/
+COPY --from=bin-build /output/bin/* /usr/local/bin/
 USER nobody
 RUN curl -sSL https://raw.githubusercontent.com/rcmorano/baids/master/baids | bash -s install
 COPY baids/* /nonexistent/.baids/functions.d/
